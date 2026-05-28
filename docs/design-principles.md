@@ -76,7 +76,19 @@ Implemented as:
 - wiki index
 - SSOT note
 
-## 8. Public Core, Private Adapters
+## 8. Memory Must Be Curated
+
+Remembering everything creates noise. Thesis OS promotes durable evidence, decisions, predictions, feedback, and process lessons while discarding or quarantining raw noise.
+
+Implemented as:
+
+- memory lifecycle
+- promotion rules
+- retention policy
+- LLM wiki retrieval layer
+- feedback memory
+
+## 9. Public Core, Private Adapters
 
 The public project should expose methods, schemas, and examples. Private deployments should keep credentials, sessions, portfolios, and paid data outside the repo.
 
@@ -85,4 +97,3 @@ Implemented as:
 - adapter contracts
 - sample adapters
 - security boundary docs
-

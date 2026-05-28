@@ -77,6 +77,108 @@ skills:
     forbidden_actions:
       - "execute trade"
 
+  - id: alpha-social-collector
+    agent: alpha
+    purpose: "Summarize social/community channel updates into evidence-graded clusters."
+    inputs:
+      - "source events"
+      - "watchlist"
+      - "thesis registry"
+    outputs:
+      - "social collection summary"
+      - "evidence candidates"
+    allowed_actions:
+      - "write summarized evidence"
+      - "route noisy items to quarantine"
+    forbidden_actions:
+      - "store private raw messages in public outputs"
+      - "treat social heat as final proof"
+
+  - id: alpha-facebook-collector
+    agent: alpha
+    purpose: "Collect and summarize public or permissioned post updates."
+    inputs:
+      - "post metadata"
+      - "allowed post text"
+      - "entity map"
+    outputs:
+      - "source summary"
+      - "evidence candidate"
+    allowed_actions:
+      - "write summarized source note"
+      - "link to entity or theme"
+    forbidden_actions:
+      - "commit cookies or browser state"
+      - "treat commentary as verified fact"
+
+  - id: alpha-youtube-scout
+    agent: alpha
+    purpose: "Create transcript-aware video notes and thesis implications."
+    inputs:
+      - "video URL"
+      - "transcript or subtitle"
+      - "metadata fallback"
+    outputs:
+      - "video source note"
+      - "thesis implication summary"
+    allowed_actions:
+      - "write transcript-confidence note"
+      - "route implications to Lattice"
+    forbidden_actions:
+      - "claim transcript coverage when only metadata was used"
+
+  - id: alpha-deep-alpha
+    agent: alpha
+    purpose: "Find non-obvious candidates from cross-source evidence and second-order effects."
+    inputs:
+      - "screeners"
+      - "social summaries"
+      - "analyst reports"
+      - "local DB"
+    outputs:
+      - "deep alpha candidate"
+      - "variant perception questions"
+      - "evidence gaps"
+    allowed_actions:
+      - "write research candidate"
+      - "request specialist analysis"
+    forbidden_actions:
+      - "skip evidence grading"
+      - "promote directly to portfolio"
+
+  - id: alpha-semiconductor-specialist
+    agent: alpha
+    purpose: "Analyze AI infrastructure, HBM, substrate, packaging, and semiconductor capex signals."
+    inputs:
+      - "market DB"
+      - "export/import proxies"
+      - "sector reports"
+      - "company evidence"
+    outputs:
+      - "specialist evidence packet"
+      - "thesis update candidate"
+    allowed_actions:
+      - "write specialist packet"
+      - "flag attribution uncertainty"
+    forbidden_actions:
+      - "make final sizing decision"
+
+  - id: alpha-top5-deep-dive
+    agent: alpha
+    purpose: "Build a structured deep dive for Top 5 review candidates."
+    inputs:
+      - "Top 5 queue"
+      - "evidence records"
+      - "thesis registry"
+    outputs:
+      - "deep dive note"
+      - "action questions"
+    allowed_actions:
+      - "write deep dive"
+      - "handoff to Lattice"
+    forbidden_actions:
+      - "call deep dive a buy decision"
+
   - id: lattice-devil-advocate
     agent: lattice
     purpose: "Challenge high-importance theses before action."

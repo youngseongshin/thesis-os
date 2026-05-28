@@ -1,0 +1,121 @@
+# Example public-safe vault governance policy for Thesis OS.
+vault_policy:
+  public_sanitized: true
+  version: 1
+  principle: "read broadly, write narrowly"
+
+defaults:
+  date_format: "%Y-%m-%d"
+  filename_separator: "-"
+  slug_style: kebab
+  collision_policy: "overwrite_same_job"
+
+document_rules:
+  evidence-note:
+    owner_agent: alpha
+    description: "Source-grounded evidence record."
+    directory: "evidence/{date}"
+    filename: "{evidence_id}.md"
+    required_context: ["date", "evidence_id"]
+
+  screener-candidate:
+    owner_agent: alpha
+    description: "Screener candidate and feature snapshot."
+    directory: "screeners/{date}"
+    filename: "{candidate_id}.md"
+    required_context: ["date", "candidate_id"]
+
+  intraday-alert:
+    owner_agent: alpha
+    description: "Holdings/watchlist attention-routing alert."
+    directory: "alerts/{date}"
+    filename: "{alert_id}.md"
+    required_context: ["date", "alert_id"]
+
+  thesis-card:
+    owner_agent: lattice
+    description: "Living thesis card."
+    directory: "theses/{entity_slug}"
+    filename: "{thesis_id}.md"
+    required_context: ["entity_slug", "thesis_id"]
+
+  decision-card:
+    owner_agent: lattice
+    description: "Decision or action rationale."
+    directory: "decisions/{date}"
+    filename: "{action_id}.md"
+    required_context: ["date", "action_id"]
+
+  prediction-feedback:
+    owner_agent: lattice
+    description: "Outcome review for prediction, screener, or action."
+    directory: "feedback/{date}"
+    filename: "{feedback_id}.md"
+    required_context: ["date", "feedback_id"]
+
+  wiki-index:
+    owner_agent: arki
+    description: "Generated retrieval index over canonical vault notes."
+    directory: "wiki"
+    filename: "index.md"
+    required_context: []
+
+  ssot-layout:
+    owner_agent: arki
+    description: "Canonical layout and policy note."
+    directory: "ssot"
+    filename: "canonical-locations.md"
+    required_context: []
+
+codeowners:
+  - path: "evidence/"
+    owner: alpha
+    notes: "Alpha writes evidence; Lattice reads."
+
+  - path: "screeners/"
+    owner: alpha
+    notes: "Alpha writes candidates; Lattice reviews."
+
+  - path: "alerts/"
+    owner: alpha
+    notes: "Alpha writes alert notes; Lattice decides whether they matter."
+
+  - path: "theses/"
+    owner: lattice
+    notes: "Lattice writes thesis cards; Alpha links evidence."
+
+  - path: "decisions/"
+    owner: lattice
+    notes: "Lattice writes decision cards and roundtable notes."
+
+  - path: "feedback/"
+    owner: lattice
+    notes: "Lattice writes outcome interpretation and process lessons."
+
+  - path: "jobs/"
+    owner: arki
+    notes: "Arki writes job manifests and run-health notes."
+
+  - path: "wiki/"
+    owner: arki
+    notes: "Arki writes generated retrieval indexes."
+
+  - path: "ssot/"
+    owner: arki
+    notes: "Arki writes canonical policy notes."
+
+validator_checks:
+  - "document rule has owner_agent, directory, filename"
+  - "rule directory is covered by codeowners"
+  - "rule owner_agent matches codeowner owner"
+  - "path is relative and stays inside vault"
+  - "generated notes include required frontmatter"
+  - "legacy aliases do not receive new writes"
+
+cleanup_policy:
+  hot_surface_retention: "short"
+  canonical_surface_retention: "durable"
+  raw_archive_location: "outside public vault or private cold archive"
+  empty_folder_policy: "delete after generator check"
+  duplicate_folder_policy: "merge into canonical path through migration"
+

@@ -8,6 +8,9 @@
 - Strengthen the README and philosophy docs around the default investment lens: Munger for discovery, O'Neil/Minervini for timing, and Druckenmiller for asymmetric concentration.
 - Add public-safe agent persona contracts and prompt-boundary guidance for Alpha, Lattice, and Arki.
 - Expand recurring job documentation and link the public-safe job manifest from the README.
+- Add memory management documentation and a sample memory policy covering capture, promotion, retrieval, retention, and feedback memory.
+- Add vault governance documentation and a sample vault policy for document routing, codeowners, canonical paths, validators, and cleanup.
+- Add skill and pipeline documentation for social/Facebook/YouTube collection, real-time market monitoring, deep dives, semiconductor specialist analysis, Deep Alpha, devil's advocate, and feedback workflows.
 
 ## 0.4.0 - 2026-05-28
 

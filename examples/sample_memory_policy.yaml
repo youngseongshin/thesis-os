@@ -1,0 +1,69 @@
+# Example memory policy for Thesis OS.
+memory_policy:
+  public_sanitized: true
+  purpose: "Keep durable judgment memory while avoiding raw-data noise."
+
+  layers:
+    - id: working-memory
+      owner_agent: ["alpha", "lattice", "arki"]
+      retention: "run-scoped"
+      promote_when:
+        - "changes thesis"
+        - "creates action"
+        - "creates prediction"
+        - "explains failure"
+
+    - id: local-database
+      owner_agent: ["alpha", "arki"]
+      retention: "durable"
+      stores:
+        - "evidence"
+        - "market_snapshots"
+        - "screener_candidates"
+        - "intraday_alerts"
+        - "feedback"
+
+    - id: vault-canonical-notes
+      owner_agent: ["alpha", "lattice", "arki"]
+      retention: "durable"
+      stores:
+        - "thesis cards"
+        - "decision cards"
+        - "roundtable notes"
+        - "feedback reports"
+        - "system notes"
+
+    - id: llm-wiki-index
+      owner_agent: ["arki"]
+      retention: "regenerated"
+      stores:
+        - "current index"
+        - "canonical locations"
+        - "freshness summary"
+
+  promotion_rules:
+    - id: promote-thesis-change
+      when: "evidence changes assumption, invalidation, or action"
+      target: "vault/theses"
+
+    - id: promote-measurable-judgment
+      when: "judgment can be evaluated over a horizon"
+      target: "prediction ledger or action queue"
+
+    - id: promote-process-lesson
+      when: "feedback identifies data, timing, crowding, interpretation, or execution failure"
+      target: "vault/feedback and wiki index"
+
+  discard_rules:
+    - id: discard-duplicate-raw
+      when: "raw item is already summarized and linked"
+      treatment: "delete or private archive"
+
+    - id: quarantine-low-confidence-social
+      when: "social signal has no official or financial evidence"
+      treatment: "quarantine summary only"
+
+    - id: never-publish-private-runtime
+      when: "item contains credentials, private channels, user memory, or account data"
+      treatment: "exclude from public repo"
+

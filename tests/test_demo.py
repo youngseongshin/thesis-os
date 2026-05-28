@@ -25,9 +25,16 @@ class DemoTest(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         required = [
             "docs/agent-persona-contracts.md",
+            "docs/domain-specialist-skills.md",
+            "docs/memory-management.md",
             "docs/recurring-jobs.md",
             "docs/sample-output-pack.md",
+            "docs/skills-and-pipelines.md",
+            "docs/vault-governance.md",
             "examples/sample_jobs.yaml",
+            "examples/sample_memory_policy.yaml",
+            "examples/sample_skill_catalog.yaml",
+            "examples/sample_vault_policy.yaml",
             "examples/sample_outputs/README.md",
             "examples/sample_outputs/thesis-card-ai-infrastructure-basket.md",
             "examples/sample_outputs/nightly-top5-deep-dive.md",

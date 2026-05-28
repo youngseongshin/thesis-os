@@ -38,3 +38,16 @@ Qualitative collectors should produce:
 
 Public code should provide adapter interfaces and sample collectors. Real sessions, cookies, channel IDs, browser states, and private credentials must stay outside the public repository.
 
+## Skill Outputs
+
+Qualitative collection should feed skills, not create unmanaged notes.
+
+| Skill | Input | Output | Route |
+|---|---|---|---|
+| Social collector | channel/community updates | topic clusters and evidence candidates | Alpha evidence memory |
+| Facebook collector | public or permissioned posts | summarized post themes | Alpha evidence memory |
+| YouTube scout | transcripts, subtitles, or metadata fallback | source note and thesis implications | Alpha -> Lattice |
+| Deep Alpha | cross-source signals | non-obvious candidates and evidence gaps | Alpha -> Lattice |
+| Deep Dive | Top 5 candidates | structured research packet | Alpha -> Lattice |
+
+Each skill should mark source confidence and fallback status. A metadata-only video note is not the same as a transcript-based source note.

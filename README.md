@@ -134,6 +134,9 @@ Included:
 
 - Philosophy and architecture docs
 - Agent persona contracts and prompt-boundary guidance
+- Memory management process for vault, local DB, LLM wiki, predictions, and feedback
+- Vault governance pattern for document policy, codeowners, canonical paths, validators, and cleanup
+- Skill catalog for collection, real-time data, deep dive, semiconductor specialist, Deep Alpha, devil's advocate, and feedback workflows
 - JSON schemas for thesis, evidence, prediction, action, feedback, skills, and recurring jobs
 - A minimal runnable Python package
 - Sample local SQLite database generation
@@ -188,6 +191,41 @@ Thesis OS depends on durable recurring work. The public core includes:
 - [sample_jobs.yaml](examples/sample_jobs.yaml)
 
 The manifest covers market-close DB refresh, Tier 1 evidence refresh, qualitative collection, screeners, Top 5 discovery, intraday monitoring, roundtables, concentrated strategy review, prediction evaluation, screener feedback, vault/wiki compilation, and health checks.
+
+## Memory Management
+
+Thesis OS treats memory as a managed process, not a dumping ground.
+
+- [Memory Management](docs/memory-management.md)
+- [Vault Governance](docs/vault-governance.md)
+- [Vault, SSOT, And LLM Wiki](docs/vault-ssot-wiki.md)
+- [sample_memory_policy.yaml](examples/sample_memory_policy.yaml)
+- [sample_vault_policy.yaml](examples/sample_vault_policy.yaml)
+
+The memory loop is:
+
+```text
+capture -> normalize -> classify -> promote/discard -> link -> summarize -> retrieve -> evaluate -> improve
+```
+
+Alpha owns evidence memory, Lattice owns judgment memory, and Arki owns system memory. The LLM wiki is a compact retrieval layer over canonical objects, not a raw archive.
+
+Vault governance adds the write-side discipline:
+
+```text
+doc_type -> policy resolver -> canonical path -> codeowner check -> frontmatter -> write -> wiki index
+```
+
+## Skills
+
+Thesis OS is composed of reusable skills with explicit owners and boundaries.
+
+- [Skills And Pipelines](docs/skills-and-pipelines.md)
+- [Domain Specialist Skills](docs/domain-specialist-skills.md)
+- [sample_agent_skills.yaml](examples/sample_agent_skills.yaml)
+- [sample_skill_catalog.yaml](examples/sample_skill_catalog.yaml)
+
+The public skill catalog includes social collection, Facebook collection, YouTube scout, real-time market monitoring, quantitative screening, Top 5 deep dives, semiconductor specialist analysis, Deep Alpha, devil's advocate, roundtable judgment, and feedback evaluation.
 
 ## Quickstart
 

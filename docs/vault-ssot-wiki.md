@@ -4,6 +4,10 @@ Thesis OS uses the vault as long-term research memory.
 
 The goal is not to create endless notes. The goal is to maintain canonical research objects that agents can find, update, and evaluate.
 
+See [Memory Management](memory-management.md) for the full capture, promotion, retrieval, feedback, and retention process.
+
+See [Vault Governance](vault-governance.md) for document policy, codeowner, validator, cleanup, and canonical-write rules.
+
 ## Canonical Object Types
 
 - `evidence/`: source-grounded facts and interpretations
@@ -24,6 +28,25 @@ Without SSOT, agents create duplicate folders and stale parallel memories. With 
 - duplicate note creation is easier to detect
 - LLM retrieval stays focused on current objects
 
+## Policy-Backed Writes
+
+In a mature deployment, generated vault writes should be policy-backed:
+
+```text
+doc_type + context -> vault document policy -> canonical path -> codeowner check -> vault writer
+```
+
+This prevents generators from hardcoding paths or creating duplicate folder structures.
+
+The public core keeps this minimal through `VaultWriter`. Private deployments can add:
+
+- document type routing
+- codeowner enforcement
+- frontmatter validation
+- legacy path compatibility
+- migration reports
+- root-alias guards
+
 ## LLM Wiki Principle
 
 The LLM wiki should not be a raw archive. It should be a compact retrieval layer over canonical objects.
@@ -41,6 +64,10 @@ Good wiki notes:
 - Alpha updates `evidence/` and `screeners/`.
 - Lattice reads evidence and screeners before updating thesis cards, predictions, decisions, and feedback.
 - Arki maintains schemas, canonical paths, wiki indexes, and SSOT notes.
+
+## Public Example Policy
+
+See [sample_vault_policy.yaml](../examples/sample_vault_policy.yaml).
 
 ## Public Demo Command
 

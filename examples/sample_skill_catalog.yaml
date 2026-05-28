@@ -1,0 +1,126 @@
+# Example public-safe skill catalog for Thesis OS.
+skill_catalog:
+  public_sanitized: true
+  version: 1
+
+  skills:
+    - id: alpha-social-collector
+      owner_agent: alpha
+      category: source_collection
+      purpose: "Summarize social/community channels into evidence-graded topic clusters."
+      inputs: ["source events", "watchlist", "thesis registry"]
+      outputs: ["social collection summary", "evidence candidates"]
+      memory_target: "evidence/"
+      forbidden_actions: ["store private raw messages in public outputs", "make portfolio decision"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-facebook-collector
+      owner_agent: alpha
+      category: source_collection
+      purpose: "Collect and summarize public or permissioned Facebook-style posts."
+      inputs: ["post metadata", "post text where allowed", "entity map"]
+      outputs: ["source summary", "evidence candidate"]
+      memory_target: "evidence/"
+      forbidden_actions: ["commit cookies", "store browser state", "treat commentary as fact"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-youtube-scout
+      owner_agent: alpha
+      category: source_collection
+      purpose: "Extract transcript-based video notes and investment implications."
+      inputs: ["video URL", "transcript/subtitle when available", "metadata fallback"]
+      outputs: ["video source note", "thesis implication summary"]
+      memory_target: "evidence/"
+      forbidden_actions: ["claim transcript coverage when only metadata was available"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-real-time-market-monitor
+      owner_agent: alpha
+      category: market_data
+      purpose: "Route intraday price/volume/flow alerts for holdings and watchlists."
+      inputs: ["intraday market events", "holdings/watchlist universe", "reference prices"]
+      outputs: ["intraday alert", "feedback-ready event record"]
+      memory_target: "alerts/"
+      forbidden_actions: ["execute trades", "turn alert into final action"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-quant-screener-stack
+      owner_agent: alpha
+      category: screening
+      purpose: "Generate candidates from quantitative features."
+      inputs: ["local market DB", "feature tables"]
+      outputs: ["screener candidates", "Top N feature snapshots"]
+      memory_target: "screeners/"
+      forbidden_actions: ["call candidates buy signals"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-deep-alpha
+      owner_agent: alpha
+      category: research_synthesis
+      purpose: "Find non-obvious candidates from cross-source evidence and second-order effects."
+      inputs: ["screeners", "social summaries", "analyst reports", "local DB"]
+      outputs: ["deep alpha candidate", "variant perception questions", "evidence gaps"]
+      memory_target: "screeners/"
+      forbidden_actions: ["skip evidence grading", "hide weak assumptions"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-semiconductor-specialist
+      owner_agent: alpha
+      category: specialist_analysis
+      purpose: "Analyze semiconductor, AI infrastructure, HBM, substrate, packaging, and capex signals."
+      inputs: ["market DB", "customs/export proxies", "company evidence", "sector reports"]
+      outputs: ["specialist evidence packet", "thesis update candidate"]
+      memory_target: "evidence/"
+      forbidden_actions: ["make final portfolio sizing decision"]
+      downstream_consumer: "lattice"
+
+    - id: alpha-top5-deep-dive
+      owner_agent: alpha
+      category: research_synthesis
+      purpose: "Build a structured deep dive for Top 5 review candidates."
+      inputs: ["Top 5 queue", "evidence records", "thesis registry"]
+      outputs: ["deep dive note", "action questions"]
+      memory_target: "screeners/"
+      forbidden_actions: ["promote directly to portfolio"]
+      downstream_consumer: "lattice"
+
+    - id: lattice-devil-advocate
+      owner_agent: lattice
+      category: judgment_challenge
+      purpose: "Attack thesis assumptions before action."
+      inputs: ["thesis card", "evidence table", "candidate record"]
+      outputs: ["red-team review", "required checks", "reject/watch/action recommendation"]
+      memory_target: "decisions/"
+      forbidden_actions: ["rubber-stamp exciting narratives"]
+      downstream_consumer: "lattice-roundtable"
+
+    - id: lattice-roundtable
+      owner_agent: lattice
+      category: portfolio_judgment
+      purpose: "Classify entities as increase, hold, decrease, exit, or watch."
+      inputs: ["thesis cards", "Alpha packets", "devil advocate output", "risk budget"]
+      outputs: ["decision card", "action queue", "prediction candidate"]
+      memory_target: "decisions/"
+      forbidden_actions: ["rewrite prior decisions after outcomes"]
+      downstream_consumer: "feedback jobs"
+
+    - id: lattice-screener-feedback
+      owner_agent: lattice
+      category: feedback
+      purpose: "Evaluate screener candidates over fixed horizons."
+      inputs: ["candidate record", "forward returns", "benchmark returns"]
+      outputs: ["screener feedback report", "rule update"]
+      memory_target: "feedback/"
+      forbidden_actions: ["change original candidate timestamp"]
+      downstream_consumer: "alpha and lattice"
+
+    - id: arki-vault-governance
+      owner_agent: arki
+      category: governance
+      purpose: "Validate vault policies, codeowners, layouts, and public/private boundaries."
+      inputs: ["vault policy", "codeowners", "repository"]
+      outputs: ["health report", "migration note"]
+      memory_target: "ssot/"
+      forbidden_actions: ["make investment decision"]
+      downstream_consumer: "all agents"
+
