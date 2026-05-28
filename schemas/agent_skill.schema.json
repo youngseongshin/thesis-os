@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/agent_skill.schema.json",
+  "title": "AgentSkill",
+  "type": "object",
+  "required": ["id", "agent", "purpose", "inputs", "outputs"],
+  "properties": {
+    "id": {"type": "string"},
+    "agent": {"type": "string", "enum": ["alpha", "gyeokja", "arki"]},
+    "purpose": {"type": "string"},
+    "inputs": {"type": "array", "items": {"type": "string"}},
+    "outputs": {"type": "array", "items": {"type": "string"}},
+    "allowed_actions": {"type": "array", "items": {"type": "string"}},
+    "forbidden_actions": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}
+

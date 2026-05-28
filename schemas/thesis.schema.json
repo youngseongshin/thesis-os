@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/thesis.schema.json",
+  "title": "Thesis",
+  "type": "object",
+  "required": ["id", "entity", "status", "claim", "assumptions", "evidence_ids", "invalidation"],
+  "properties": {
+    "id": {"type": "string"},
+    "entity": {"type": "string"},
+    "status": {"type": "string", "enum": ["draft", "active", "watch", "weakened", "invalidated", "retired"]},
+    "claim": {"type": "string"},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "invalidation": {"type": "array", "items": {"type": "string"}},
+    "updated_at": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}
+

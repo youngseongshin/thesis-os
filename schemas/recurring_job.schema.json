@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/recurring_job.schema.json",
+  "title": "RecurringJob",
+  "type": "object",
+  "required": ["id", "owner_agent", "cadence", "command", "outputs"],
+  "properties": {
+    "id": {"type": "string"},
+    "owner_agent": {"type": "string", "enum": ["alpha", "gyeokja", "arki"]},
+    "cadence": {"type": "string"},
+    "command": {"type": "string"},
+    "outputs": {"type": "array", "items": {"type": "string"}},
+    "freshness_sla": {"type": "string"},
+    "failure_policy": {"type": "string"},
+    "enabled": {"type": "boolean"}
+  },
+  "additionalProperties": true
+}
+

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/feedback.schema.json",
+  "title": "Feedback",
+  "type": "object",
+  "required": ["id", "prediction_id", "evaluated_at", "hit", "failure_mode"],
+  "properties": {
+    "id": {"type": "string"},
+    "prediction_id": {"type": "string"},
+    "evaluated_at": {"type": "string"},
+    "hit": {"type": "boolean"},
+    "absolute_return": {"type": "number"},
+    "benchmark_return": {"type": "number"},
+    "excess_return": {"type": "number"},
+    "mfe": {"type": "number"},
+    "mae": {"type": "number"},
+    "failure_mode": {"type": "string", "enum": ["none", "data_failure", "interpretation_failure", "timing_failure", "already_priced_in", "execution_failure", "unknown"]},
+    "lesson": {"type": "string"}
+  },
+  "additionalProperties": true
+}
+

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thesis-os"
+version = "0.1.0"
+description = "A three-agent, thesis-driven investment research operating system."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+  {name = "Thesis OS Contributors"}
+]
+keywords = ["investment", "research", "agents", "thesis", "evidence", "feedback-loop"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.scripts]
+thesis-os = "thesis_os.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["thesis_os*"]
+

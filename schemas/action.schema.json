@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/action.schema.json",
+  "title": "Action",
+  "type": "object",
+  "required": ["id", "entity", "action", "reason", "evidence_ids", "created_at"],
+  "properties": {
+    "id": {"type": "string"},
+    "entity": {"type": "string"},
+    "action": {"type": "string", "enum": ["watch", "deep_dive", "thesis_audit", "add_candidate", "trim_candidate", "hold", "no_action", "invalidate"]},
+    "reason": {"type": "string"},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "thesis_id": {"type": "string"},
+    "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+    "created_at": {"type": "string"},
+    "next_check": {"type": "string"}
+  },
+  "additionalProperties": true
+}
+

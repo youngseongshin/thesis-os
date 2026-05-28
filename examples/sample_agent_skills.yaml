@@ -1,0 +1,46 @@
+# Example skill contracts.
+skills:
+  - id: alpha-evidence-builder
+    agent: alpha
+    purpose: "Convert source updates into evidence records."
+    inputs:
+      - "market data"
+      - "qualitative channel update"
+    outputs:
+      - "evidence"
+      - "research packet"
+    allowed_actions:
+      - "write evidence"
+      - "update local db"
+    forbidden_actions:
+      - "make final portfolio decision"
+
+  - id: gyeokja-devil-advocate
+    agent: gyeokja
+    purpose: "Challenge high-importance theses before action."
+    inputs:
+      - "thesis"
+      - "evidence"
+    outputs:
+      - "red-team checklist"
+      - "decision card"
+    allowed_actions:
+      - "recommend action"
+      - "register prediction"
+    forbidden_actions:
+      - "execute trade"
+
+  - id: arki-schema-lint
+    agent: arki
+    purpose: "Check schemas and public/private boundaries."
+    inputs:
+      - "repository"
+      - "schemas"
+    outputs:
+      - "health report"
+    allowed_actions:
+      - "write migration note"
+      - "fail CI"
+    forbidden_actions:
+      - "change investment thesis"
+

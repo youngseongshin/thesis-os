@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/prediction.schema.json",
+  "title": "Prediction",
+  "type": "object",
+  "required": ["id", "entity", "thesis_id", "prediction", "direction", "horizon", "created_at", "evaluation_due"],
+  "properties": {
+    "id": {"type": "string"},
+    "entity": {"type": "string"},
+    "thesis_id": {"type": "string"},
+    "prediction": {"type": "string"},
+    "direction": {"type": "string", "enum": ["up", "down", "neutral", "relative_outperform", "relative_underperform"]},
+    "horizon": {"type": "string", "enum": ["3d", "1w", "2w", "1m", "2m", "3m", "6m", "1y"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "created_at": {"type": "string"},
+    "evaluation_due": {"type": "string"},
+    "evidence_ids": {"type": "array", "items": {"type": "string"}},
+    "invalidation": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}
+

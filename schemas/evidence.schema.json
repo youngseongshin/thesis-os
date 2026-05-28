@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thesis-os.org/schemas/evidence.schema.json",
+  "title": "Evidence",
+  "type": "object",
+  "required": ["id", "entity", "source_type", "source", "source_date", "collected_at", "claim", "confidence"],
+  "properties": {
+    "id": {"type": "string"},
+    "entity": {"type": "string"},
+    "source_type": {"type": "string", "enum": ["filing", "market_data", "news", "telegram", "facebook", "youtube", "email", "research_note", "internal_note", "other"]},
+    "source": {"type": "string"},
+    "source_url": {"type": "string"},
+    "source_date": {"type": "string"},
+    "collected_at": {"type": "string"},
+    "claim": {"type": "string"},
+    "interpretation": {"type": "string"},
+    "confidence": {"type": "string", "enum": ["high", "medium", "low", "unverified"]},
+    "tags": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}
+

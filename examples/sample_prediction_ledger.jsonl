@@ -1,0 +1,2 @@
+{"id":"PRED-SAMPLE-001","entity":"AI Infrastructure Basket","thesis_id":"THESIS-SAMPLE-AI-INFRA-001","prediction":"The sample basket should outperform its benchmark if evidence remains positive and market reflection is incomplete.","direction":"relative_outperform","horizon":"1m","confidence":0.55,"created_at":"2026-01-31T00:00:00+00:00","evaluation_due":"sample+1m","evidence_ids":["EVID-SAMPLE-001","EVID-SAMPLE-002"],"invalidation":["Two consecutive evidence updates weaken demand persistence.","Price and consensus already reflect the positive scenario."]}
+
