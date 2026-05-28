@@ -62,7 +62,27 @@ flowchart LR
 8. 판단이 시장 결과로 검증 가능하면 Prediction Ledger 또는 Action Queue에 사전 기록합니다.
 9. 이후 기간별 성과평가가 테시스, 스크리너 룰, 격자의 판단 프로세스에 다시 환류됩니다.
 
-기본 투자철학은 멍거의 격자적 사고, 윌리엄 오닐의 강도/타이밍/손실 규율, 드라켄밀러의 집중/유연성/비대칭 사고를 참고합니다.
+기본 투자철학은 명확합니다. **멍거의 격자적 사고로 발굴하고, 윌리엄 오닐과 마크 미네르비니로 투자 타이밍을 선별하고, 드라켄밀러처럼 비대칭 기회에 집중적으로 베팅한다**는 구조입니다.
+
+## 기본 투자철학
+
+실제 Thesis OS 배포 환경에서는 vault에 **투자철학 원장**을 둘 수 있습니다. 공개 버전에서는 같은 원칙을 [Investment Philosophy](docs/investment-philosophy.md)에 문서화합니다. 철학은 감각으로 남겨두는 것이 아니라, 판단과 연결되고, 사후 피드백으로 검증되어야 합니다.
+
+기본 철학은 세 층입니다.
+
+| 층 | 투자자 렌즈 | Thesis OS에서의 의미 |
+|---|---|---|
+| 발굴 | 찰리 멍거 | evidence, 인센티브, 베이스레이트, 시장 구조, 밸류에이션, 리스크, 반대 논리를 격자처럼 엮어 기회를 찾음 |
+| 타이밍 | 윌리엄 오닐 + 마크 미네르비니 | 상대강도, 주도주, 가격/거래량 구조, 과열 여부, 손절/무효화 조건으로 진입 타이밍을 선별 |
+| 베팅 | 스탠리 드라켄밀러 | 근거, 타이밍, 손익비, 유연성이 맞을 때만 집중하고, 사실이 바뀌면 빠르게 바꿈 |
+
+실제 운영에서는 이렇게 번역됩니다.
+
+- Alpha는 정량 스크리너, 소셜 수집, 애널리스트 리포트 수집으로 후보를 발굴합니다.
+- Lattice/격자는 멍거식 격자 사고로 후보를 하나의 스토리가 아니라 여러 렌즈로 해석합니다.
+- 격자는 오닐/미네르비니식 타이밍 규율로 약한 셋업, 과열된 셋업, 무효화된 셋업을 걸러냅니다.
+- 격자는 드라켄밀러식 관점으로 소수의 비대칭 기회에 집중하되, 증거가 바뀌면 판단을 바꿉니다.
+- 피드백 루프는 이 철학이 실제로 판단 품질을 높였는지 기간별 성과로 검증합니다.
 
 ## 세 에이전트
 
@@ -171,6 +191,7 @@ python -m thesis_os arki build-wiki-index --workspace ./workspace
 - 샘플 adapter contract
 - 샘플 local DB / vault 생성
 - prediction ledger와 feedback evaluator
+- thesis card, nightly screening, concentrated strategy, screener feedback, social collection 샘플 산출물
 
 공개 repo에 포함하지 않는 것:
 
@@ -182,6 +203,19 @@ python -m thesis_os arki build-wiki-index --workspace ./workspace
 - Gmail 원문
 - 유료 데이터 raw
 - 사적 vault
+
+## 샘플 산출물 팩
+
+공개 repo에는 실제 Research OS의 구조를 이해할 수 있는 공개 안전 샘플 산출물이 포함되어 있습니다.
+
+- [테시스 카드](examples/sample_outputs/thesis-card-ai-infrastructure-basket.md)
+- [나이트 Top 5 딥다이브](examples/sample_outputs/nightly-top5-deep-dive.md)
+- [나이트 집중전략 리뷰](examples/sample_outputs/nightly-concentration-strategy.md)
+- [스크리너 종목 발굴 결과](examples/sample_outputs/screener-discovery-results.md)
+- [스크리너 성과 피드백](examples/sample_outputs/screener-performance-feedback.md)
+- [소셜 수집 요약](examples/sample_outputs/social-collection-summary.md)
+
+이 샘플들은 모두 합성 예시입니다. 실제 포트폴리오, 실제 보유 비중, 사적 채널 원문, 계좌 정보, 유료 데이터 raw를 포함하지 않습니다. 자세한 공개 경계는 [Sample Output Pack](docs/sample-output-pack.md)을 참고하세요.
 
 ## 프로젝트 상태
 

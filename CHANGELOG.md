@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 - 2026-05-28
+
+- Add a public-safe sample output pack covering thesis cards, nightly Top 5 deep dives, concentrated strategy reviews, screener discovery, screener feedback, and social collection.
+- Link sample outputs from English and Korean READMEs.
+- Add a sample-output boundary doc and test coverage for public-sanitized metadata.
+- Strengthen the README and philosophy docs around the default investment lens: Munger for discovery, O'Neil/Minervini for timing, and Druckenmiller for asymmetric concentration.
+
 ## 0.4.0 - 2026-05-28
 
 - Add screener candidate schema and screener feedback schema.

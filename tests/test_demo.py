@@ -21,6 +21,25 @@ class DemoTest(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         self.assertEqual(run_lint(root), 0)
 
+    def test_sample_outputs_are_public_sanitized(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        required = [
+            "examples/sample_outputs/README.md",
+            "examples/sample_outputs/thesis-card-ai-infrastructure-basket.md",
+            "examples/sample_outputs/nightly-top5-deep-dive.md",
+            "examples/sample_outputs/nightly-concentration-strategy.md",
+            "examples/sample_outputs/screener-discovery-results.md",
+            "examples/sample_outputs/screener-performance-feedback.md",
+            "examples/sample_outputs/social-collection-summary.md",
+        ]
+        for rel_path in required:
+            path = root / rel_path
+            self.assertTrue(path.exists(), rel_path)
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("public_sanitized: true", text)
+            self.assertIn("not_financial_advice: true", text)
+            self.assertIn("source_policy: synthetic_example", text)
+
     def test_agent_cli_loop(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             workspace = Path(tmp) / "workspace"

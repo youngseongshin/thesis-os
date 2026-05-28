@@ -67,7 +67,27 @@ The default workflow is built for holdings and watchlists:
 8. Lattice registers predictions or actions when a judgment has a measurable market implication.
 9. Feedback jobs evaluate outcomes over fixed horizons and feed lessons back into thesis cards, screener rules, and Lattice judgment process.
 
-The default philosophy borrows from Munger's latticework of mental models, William O'Neil's strength and loss-discipline framework, and Stanley Druckenmiller's concentration, flexibility, and asymmetry.
+The default philosophy is deliberately explicit: use Munger's latticework to discover and understand opportunities, use William O'Neil and Mark Minervini to filter timing and risk, and bet with a Druckenmiller-style focus on concentration, flexibility, and asymmetry.
+
+## Default Investment Philosophy
+
+A live Thesis OS deployment can maintain an **Investment Philosophy Ledger** in its vault. The public version documents the same idea in [Investment Philosophy](docs/investment-philosophy.md): philosophy should be written down, linked to decisions, and audited through feedback rather than left as vague taste.
+
+The default operating philosophy has three layers:
+
+| Layer | Investor Lens | Thesis OS Translation |
+|---|---|---|
+| Discovery | Charlie Munger | Use a latticework of mental models to find ideas from evidence, incentives, base rates, market structure, valuation, and counterarguments |
+| Timing | William O'Neil + Mark Minervini | Require leadership, relative strength, constructive price/volume action, controlled extension risk, and clear invalidation |
+| Betting | Stanley Druckenmiller | Concentrate only when evidence, timing, risk/reward, and flexibility align; change quickly when facts change |
+
+In practice:
+
+- Alpha finds candidates through quantitative screeners, social collection, and analyst-report collection.
+- Lattice interprets candidates through the Munger-style lattice rather than a single narrative.
+- Lattice uses O'Neil/Minervini-style timing discipline to avoid buying weak, extended, or invalidated setups.
+- Lattice sizes and prioritizes through a Druckenmiller-style lens: few high-conviction opportunities, asymmetric upside, and willingness to reverse when evidence changes.
+- Feedback jobs test whether this philosophy actually improved decisions.
 
 ## Three Agents
 
@@ -126,6 +146,7 @@ Included:
 - Intraday holdings/watchlist alert adapter
 - Lattice judgment feedback loop
 - Vault wiki index and SSOT note generation
+- Public-safe sample output pack for thesis cards, nightly screening, concentrated strategy, screener feedback, and social collection
 
 Excluded:
 
@@ -134,6 +155,19 @@ Excluded:
 - Private vault contents
 - API keys and secrets
 - User-specific chat history
+
+## Sample Output Pack
+
+The repository includes sanitized examples of the outputs a Thesis OS deployment can produce:
+
+- [Thesis card](examples/sample_outputs/thesis-card-ai-infrastructure-basket.md)
+- [Nightly Top 5 deep dive](examples/sample_outputs/nightly-top5-deep-dive.md)
+- [Nightly concentrated strategy](examples/sample_outputs/nightly-concentration-strategy.md)
+- [Screener discovery results](examples/sample_outputs/screener-discovery-results.md)
+- [Screener performance feedback](examples/sample_outputs/screener-performance-feedback.md)
+- [Social collection summary](examples/sample_outputs/social-collection-summary.md)
+
+These examples are synthetic and public-safe. They demonstrate structure, not investment advice or real portfolio data. See [Sample Output Pack](docs/sample-output-pack.md) for the boundary rules.
 
 ## Quickstart
 
