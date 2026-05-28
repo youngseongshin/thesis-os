@@ -10,6 +10,8 @@ It is intentionally public-safe. It describes reusable architecture and contract
 |---|---|---|
 | Three-agent model | Reflected | Alpha, Lattice, Arki docs and CLI |
 | Thesis / evidence / action / prediction / feedback loop | Reflected | schemas, demo CLI, vault notes, feedback commands |
+| No-key public stock quickstart | Reflected | `thesis-os quickstart-stock` uses public daily price data or a local price CSV to run screener -> thesis -> prediction -> feedback |
+| Public data-source strategy | Reflected | `docs/public-data-sources.md` documents how to plug in Stooq, FinanceDataReader, OpenBB, pykrx, SEC/DART, FRED, customs APIs, and compatible public datasets |
 | Quant screeners and Top 5 discovery | Reflected | Research OS-style CSV-backed quant stack; `alpha discover` uses social/report signals only as context overlays |
 | Local listed-equity database refresh | Reflected | CSV-backed KR/US market snapshot adapter |
 | Intraday holdings/watchlist monitor | Reflected | CSV-backed alert adapter |
@@ -30,7 +32,19 @@ It is intentionally public-safe. It describes reusable architecture and contract
 
 ## Executable Public Components
 
-### 1. Harness Contracts And Delivery Policy
+### 1. No-Key Public Stock Quickstart
+
+Users can run a public-data loop without broker credentials:
+
+```bash
+thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+```
+
+It fetches or accepts public price history, creates market and screener CSV adapters, writes evidence to the local DB/vault, builds a thesis and decision card, registers a prediction, evaluates historical forward returns, builds the wiki/SSOT notes, and exports the dashboard.
+
+The quickstart proves the operating loop. It is not financial advice and not a buy signal.
+
+### 2. Harness Contracts And Delivery Policy
 
 Research jobs should behave like contracts:
 
@@ -51,7 +65,7 @@ Public implementation:
 - `examples/sample_harness_contracts.json`
 - `thesis-os arki validate-harness`
 
-### 2. Customs / Trade Proxy Evidence
+### 3. Customs / Trade Proxy Evidence
 
 Some investment theses need non-price evidence such as export-import, customs, or supply-chain proxy data.
 
@@ -63,7 +77,7 @@ Public implementation:
 
 The public version is CSV-backed. Private deployments can replace CSV input with official APIs or paid shipment data while preserving the same output contract.
 
-### 3. Dashboard Cockpit
+### 4. Dashboard Cockpit
 
 Users need to see thesis cards, watchlist state, portfolio-oriented actions, and performance feedback in one place.
 

@@ -7,17 +7,15 @@
 
 > Build investment research agents that do not just summarize markets. They maintain theses, make decisions, register predictions, and grade themselves later.
 
-**Thesis OS is an evidence-first, thesis-driven investment research operating system.** It combines quantitative data, qualitative intelligence, local databases, vault memory, agent workflows, prediction ledgers, and feedback loops into one auditable judgment machine.
+**Thesis OS is an evidence-first, thesis-driven investment research operating system.** It combines quantitative data, qualitative intelligence, local databases, vault memory, agent-ready workflows, prediction ledgers, and feedback loops into one auditable judgment loop.
 
 It is built for investors and builders working on **stock research, stock screeners, equity research, portfolio management, trading journals, investment agents, and AI-assisted research workflows**.
 
-It is not an autonomous trading bot or an AI stock picker. It is a framework for making investment judgment explicit, testable, and improvable.
-
-**Search keywords:** investment research, stock research, stock screener, trading journal, portfolio management, equity research, quantitative finance, AI agents, local-first research OS.
+It is not an autonomous trading bot, a signal seller, or an AI stock picker. It is a framework for making investment judgment explicit, testable, and improvable.
 
 ## What This Project Is
 
-Thesis OS is not a clone of a private portfolio system and not a finished alpha machine. It is a runnable open-source core for building your own thesis-driven investment research system.
+Thesis OS is not a clone of a private portfolio system and not a complete private deployment. It is a runnable open-source core for building your own thesis-driven investment research system.
 
 Bring your own data sources, investing philosophy, watchlists, broker adapters, private notes, and agent prompts. Thesis OS gives you the operating structure: how to turn fragmented market information into theses, decisions, predictions, and feedback.
 
@@ -45,17 +43,19 @@ Most AI investing tools try to recommend stocks. Thesis OS takes a different rou
    - Reduce the common failure mode where research accumulates but becomes hard for humans and agents to retrieve.
 
 5. **A runnable starter kit**
+   - No-key public stock-data quickstart.
    - CSV-backed quantitative screener.
    - Sample thesis card, decision card, prediction ledger, feedback evaluator, vault notes, dashboard, and GitHub Actions CI.
 
 ## What You Can Try Today
 
-No broker credentials, private chats, or paid feeds are required for the public demo.
+No broker credentials, private chats, or paid feeds are required for the public quickstart.
 
 | Goal | Start Here | Result |
 |---|---|---|
-| Run the full thesis loop | `thesis-os demo --out ./demo_run` | Local DB, vault notes, thesis card, decision card, prediction ledger, feedback notes, and dashboard |
-| See the cockpit | `open ./demo_run/vault/dashboard/index.html` | A static review surface for theses, watchlists, actions, predictions, and feedback |
+| Run a no-key public stock loop | `thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY` | Public price data -> quant screener -> thesis card -> prediction -> forward-return feedback -> dashboard |
+| See the cockpit | `open ./quickstart_run/vault/dashboard/index.html` | A static review surface for theses, watchlists, actions, predictions, and feedback |
+| Run the fully offline synthetic demo | `thesis-os demo --out ./demo_run` | Local DB, vault notes, sample thesis card, decision card, prediction ledger, feedback notes, and dashboard |
 | Inspect realistic outputs | [`examples/sample_outputs/`](examples/sample_outputs/) | Public-safe thesis card, Top 5 deep dive, concentration strategy, screener results, screener feedback, and social collection |
 | Extend the system | [`examples/sample_jobs.yaml`](examples/sample_jobs.yaml), [`examples/sample_agent_skills.yaml`](examples/sample_agent_skills.yaml) | Recurring job and skill contracts that keep automation auditable |
 
@@ -82,6 +82,20 @@ These channels are examples of a live research publishing surface. They are not 
 | Automation is a bundle of scripts | Harness contracts define owner, trigger, inputs, outputs, delivery, and failure policy |
 | Portfolio review is hard to audit | Dashboard cockpit shows theses, watchlist alerts, actions, predictions, and performance feedback |
 
+## Bring Your Own Data
+
+Thesis OS does not need to own the data layer. There are already many excellent public quantitative databases, official filings, and analysis libraries. The framework is designed to ingest them through adapters and keep the judgment trail auditable.
+
+| Data layer | Examples | Use in Thesis OS |
+|---|---|---|
+| Price and volume | Yahoo Finance chart endpoint, Stooq, Yahoo Finance-compatible CSV exports, FinanceDataReader, OpenBB | market snapshots, screeners, forward-return feedback |
+| Fundamentals and filings | SEC EDGAR, edgartools, DART/OpenDART, company IR pages | evidence records, thesis assumptions, invalidation checks |
+| Korea listed equities | pykrx, KRX-derived files, FinanceDataReader, OpenDART | KR screeners, flows, short-sale/stock-loan overlays where available |
+| Macro and supply-chain proxy | FRED, central banks, statistical agencies, customs/export-import APIs | regime evidence, sector proxy evidence, risk checks |
+| Alternative public datasets | Nasdaq Data Link free datasets, Hugging Face datasets, Kaggle datasets with compatible licenses | thematic research, classifiers, event datasets |
+
+The default quickstart uses a no-key public Yahoo Finance chart endpoint to prove the loop. Serious users can replace that adapter with OpenBB, FinanceDataReader, pykrx, EDGAR/DART, broker exports, licensed datasets, or their own research database. Always check license, delay, redistribution, corporate-action adjustment, and survivorship-bias rules before production use. See [Public Data Sources](docs/public-data-sources.md).
+
 ## Run It In 60 Seconds
 
 ```bash
@@ -90,10 +104,12 @@ cd thesis-investment-os
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-thesis-os demo --out ./demo_run
+thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
 ```
 
-The demo creates a local SQLite DB, markdown vault, thesis card, decision card, prediction ledger, screener outputs, feedback notes, governance checks, sample adapter evidence, and a static dashboard at `demo_run/vault/dashboard/index.html`.
+The quickstart uses public no-key daily stock data by default. It creates a local SQLite DB, markdown vault, quantitative screener candidates, thesis card, decision card, prediction ledger, forward-return feedback notes, wiki/SSOT notes, and a static dashboard at `quickstart_run/vault/dashboard/index.html`.
+
+Prefer a fully offline run? Use `thesis-os demo --out ./demo_run` to generate synthetic public-safe sample data.
 
 <p align="center">
   <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
@@ -328,26 +344,30 @@ cd thesis-investment-os
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-thesis-os demo --out ./demo_run
+thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
 ```
 
-The demo creates:
+The no-key public quickstart creates:
 
 <p align="center">
   <img src="docs/assets/demo-workspace-tree.svg" alt="Thesis OS demo workspace tree" width="85%">
 </p>
 
-- `demo_run/local/thesis_os.db`
-- `demo_run/vault/evidence/`
-- `demo_run/vault/theses/`
-- `demo_run/vault/decisions/`
-- `demo_run/vault/feedback/`
-- `demo_run/vault/dashboard/index.html`
-- `demo_run/prediction_ledger.jsonl`
+- `quickstart_run/local/thesis_os.db`
+- `quickstart_run/quickstart_market_snapshots.csv`
+- `quickstart_run/quickstart_quant_features.csv`
+- `quickstart_run/vault/evidence/`
+- `quickstart_run/vault/screeners/`
+- `quickstart_run/vault/theses/`
+- `quickstart_run/vault/decisions/`
+- `quickstart_run/vault/feedback/`
+- `quickstart_run/vault/dashboard/index.html`
+- `quickstart_run/prediction_ledger.jsonl`
 
 You can also run without installing:
 
 ```bash
+python -m thesis_os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
 python -m thesis_os demo --out ./demo_run
 python -m thesis_os lint --root .
 ```
@@ -356,6 +376,8 @@ Agent-specific commands:
 
 ```bash
 python -m thesis_os arki init --workspace ./workspace
+python -m thesis_os quickstart-stock --out ./quickstart_run \
+  --tickers NVDA,AAPL,MSFT --benchmark SPY
 python -m thesis_os alpha sample-collect --workspace ./workspace
 python -m thesis_os alpha run-screener --workspace ./workspace
 python -m thesis_os alpha run-quant-screener --workspace ./workspace \
@@ -428,6 +450,10 @@ This is an early public scaffold. The current implementation focuses on the mini
 Specialized adapters such as trade/customs proxy data are included as examples of how to extend the evidence layer. They are not the center of the framework. The current coverage map is in [Thesis OS Coverage](docs/thesis-os-coverage.md).
 
 The next milestones are connector interfaces, richer feedback metrics, reproducible job scheduling, and stronger dashboard examples.
+
+## Launch Note
+
+For the public positioning draft, see [Why Thesis OS Is Not Another Stock Picker](docs/public-launch-post.md). The short version: Thesis OS is not promising alpha. It is a starter framework for building an auditable stock research and trading-journal loop from public or private data sources.
 
 ## Community
 

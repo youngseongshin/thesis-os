@@ -29,9 +29,19 @@ Thesis OS is not:
 ## Launch Checklist
 
 - README explains the loop in under one minute.
-- Demo runs without credentials.
+- A no-key public-stock quickstart runs without broker credentials or paid feeds.
+- Public data sources are positioned as pluggable inputs, not bundled proprietary datasets.
+- Screener feedback is visible as the core accountability mechanism.
 - CI passes.
 - Contributor docs exist.
 - Security boundary is explicit.
 - Screenshots or diagrams are added later.
 - Issues are prefilled with agent ownership and object ownership.
+
+## Launch Copy Rule
+
+Avoid claiming that the public repository is a finished alpha machine. The public message should be:
+
+> Thesis OS is a runnable framework for building a thesis-driven stock research and trading-journal loop. It helps users plug in public or private data, create thesis cards, register predictions, and evaluate whether their screeners and judgments worked.
+
+The repo should lead with the no-key quickstart, then explain the philosophy. Philosophy matters more after the user has seen something run.

@@ -9,7 +9,8 @@ In Thesis OS, a "screener" means a deterministic quantitative rule or score. Soc
 ## Screener Loop
 
 ```text
-KR/US market-close local DB refresh
+public/owned market data adapter
+  -> KR/US market-close local DB refresh
   -> quant screener stack
   -> social/community signal collection
   -> analyst-report signal collection
@@ -20,6 +21,14 @@ KR/US market-close local DB refresh
   -> forward return evaluation
   -> screener rule improvement
 ```
+
+The fastest public demonstration is:
+
+```bash
+thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+```
+
+This uses public price history to create a screener candidate and then immediately evaluates a historical forward-return horizon. Replace the price adapter with OpenBB, FinanceDataReader, pykrx, a broker export, or an internal research database when richer data is available.
 
 ## Why This Matters
 

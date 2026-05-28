@@ -12,6 +12,7 @@ from thesis_os.alpha.evidence_builder import event_to_evidence, ingest_csv_to_wo
 from thesis_os.alpha.intraday_monitor import run_intraday_monitor
 from thesis_os.alpha.local_db import connect, init_db, insert_evidence, list_evidence, list_screener_candidates
 from thesis_os.alpha.market_db import run_market_db_refresh
+from thesis_os.alpha.public_stock_quickstart import DEFAULT_BENCHMARK, DEFAULT_TICKERS, run_stock_quickstart
 from thesis_os.alpha.quant_screener import run_quant_screener
 from thesis_os.alpha.screener import run_sample_screener
 from thesis_os.alpha.trade_proxy import run_trade_proxy
@@ -40,6 +41,22 @@ def main(argv: list[str] | None = None) -> int:
 
     demo_parser = sub.add_parser("demo", help="Generate a runnable sample Thesis OS loop.")
     demo_parser.add_argument("--out", default="./demo_run", help="Output directory.")
+
+    stock_parser = sub.add_parser("quickstart-stock", help="Run a no-key public stock-data screener -> thesis -> feedback loop.")
+    stock_parser.add_argument("--out", default="./quickstart_run", help="Output directory.")
+    stock_parser.add_argument(
+        "--tickers",
+        default=",".join(DEFAULT_TICKERS),
+        help="Comma-separated stock tickers. Defaults to a public US mega-cap sample.",
+    )
+    stock_parser.add_argument("--benchmark", default=DEFAULT_BENCHMARK, help="Benchmark ticker. Default: SPY.")
+    stock_parser.add_argument("--top-n", type=int, default=5, help="Number of screener candidates to keep.")
+    stock_parser.add_argument("--horizon-days", type=int, default=63, help="Historical forward-return horizon in trading days.")
+    stock_parser.add_argument(
+        "--price-csv",
+        default="",
+        help="Optional local CSV with ticker,date,open,high,low,close,volume for offline or custom data.",
+    )
 
     init_parser = sub.add_parser("init", help="Initialize a local Thesis OS workspace.")
     init_parser.add_argument("--out", default="./thesis_os_workspace", help="Output directory.")
@@ -131,6 +148,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "demo":
         return run_demo(Path(args.out))
+    if args.command == "quickstart-stock":
+        tickers = [item.strip() for item in str(args.tickers).split(",") if item.strip()]
+        result = run_stock_quickstart(
+            workspace=Path(args.out),
+            tickers=tickers,
+            benchmark=args.benchmark,
+            top_n=args.top_n,
+            horizon_days=args.horizon_days,
+            price_csv=args.price_csv or None,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
     if args.command == "init":
         return run_init(Path(args.out))
     if args.command == "lint":

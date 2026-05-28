@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from datetime import date, timedelta
 from pathlib import Path
 
 from thesis_os.alpha.quant_screener import build_quant_candidates
@@ -22,6 +23,69 @@ class DemoTest(unittest.TestCase):
     def test_schema_lint(self) -> None:
         root = Path(__file__).resolve().parents[1]
         self.assertEqual(run_lint(root), 0)
+
+    def test_public_stock_quickstart_runs_with_local_price_csv(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp) / "quickstart"
+            price_csv = Path(tmp) / "prices.csv"
+            self._write_price_csv(price_csv)
+            self.assertEqual(
+                main(
+                    [
+                        "quickstart-stock",
+                        "--out",
+                        str(workspace),
+                        "--tickers",
+                        "NVDA,AAPL,MSFT",
+                        "--benchmark",
+                        "SPY",
+                        "--top-n",
+                        "3",
+                        "--horizon-days",
+                        "21",
+                        "--price-csv",
+                        str(price_csv),
+                    ]
+                ),
+                0,
+            )
+            self.assertTrue((workspace / "quickstart_manifest.json").exists())
+            self.assertTrue((workspace / "quickstart_market_snapshots.csv").exists())
+            self.assertTrue((workspace / "quickstart_quant_features.csv").exists())
+            self.assertTrue((workspace / "local" / "thesis_os.db").exists())
+            self.assertTrue((workspace / "vault" / "evidence" / "public-stock-quickstart.md").exists())
+            self.assertTrue((workspace / "vault" / "dashboard" / "index.html").exists())
+            self.assertTrue((workspace / "vault" / "theses" / "THESIS-QUICKSTART-NVDA.md").exists())
+            self.assertTrue(any((workspace / "vault" / "feedback").glob("*_screener_feedback.md")))
+
+    def _write_price_csv(self, path: Path) -> None:
+        lines = ["ticker,date,open,high,low,close,volume"]
+        specs = {
+            "NVDA": (100.0, 0.0060, 2_000_000),
+            "AAPL": (150.0, 0.0025, 1_500_000),
+            "MSFT": (200.0, 0.0030, 1_700_000),
+            "SPY": (400.0, 0.0015, 3_000_000),
+        }
+        start = date(2025, 1, 1)
+        for ticker, (base, drift, base_volume) in specs.items():
+            for idx in range(180):
+                close = base * ((1.0 + drift) ** idx)
+                volume = base_volume * (1.0 + (0.002 * idx))
+                current_date = start + timedelta(days=idx)
+                lines.append(
+                    ",".join(
+                        [
+                            ticker,
+                            current_date.isoformat(),
+                            f"{close * 0.99:.4f}",
+                            f"{close * 1.01:.4f}",
+                            f"{close * 0.98:.4f}",
+                            f"{close:.4f}",
+                            f"{volume:.0f}",
+                        ]
+                    )
+                )
+        path.write_text("\n".join(lines), encoding="utf-8")
 
     def test_quant_screener_uses_numeric_researchos_stack(self) -> None:
         rows = [
