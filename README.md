@@ -116,7 +116,7 @@ Prefer a fully offline run? Use `thesis-os demo --out ./demo_run` to generate sy
 </p>
 
 <p align="center">
-  <img src="docs/assets/thesis-os-architecture.svg" alt="Thesis OS architecture" width="100%">
+  <img src="docs/assets/thesis-os-architecture.png" alt="Thesis OS architecture" width="100%">
 </p>
 
 ## Core Idea
