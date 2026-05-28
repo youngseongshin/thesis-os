@@ -2,7 +2,7 @@
 
 Thesis OS treats the vault as an operational memory system. A vault that accepts arbitrary generated notes will eventually become hard to search, hard to trust, and unsafe to publish.
 
-The public pattern is inspired by a live Research OS, but generalized for open-source use.
+The public pattern is inspired by a live Thesis OS, but generalized for open-source use.
 
 ## Core Principle
 

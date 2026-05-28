@@ -74,7 +74,7 @@ def build_sample_screener_candidates(evidence: list[Evidence]) -> list[ScreenerC
                 id=str(item["id"]),
                 entity=str(item["entity"]),
                 ticker=str(item["ticker"]),
-                screener_name="sample_researchos_meta_quant",
+                screener_name="sample_thesisos_meta_quant",
                 as_of_date="2026-01-31",
                 score=round(score, 4),
                 features={
@@ -121,7 +121,7 @@ def run_sample_screener(workspace: str | Path) -> dict[str, object]:
 
     return {
         "workspace": str(workspace),
-        "screener": "sample_researchos_meta_quant",
+        "screener": "sample_thesisos_meta_quant",
         "candidate_count": len(candidates),
         "top_candidate": candidates[0].id if candidates else "",
     }

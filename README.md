@@ -31,7 +31,7 @@ Most AI investing tools try to recommend stocks. Thesis OS takes a different rou
 
 2. **A quant screener-to-judgment loop**
    - Connect quantitative stock screeners to candidate queues, thesis cards, and forward-return feedback.
-   - Evaluate whether a screener signal worked over fixed horizons instead of just collecting interesting names.
+   - Evaluate whether a screener signal worked over fixed horizons and rolling walk-forward windows instead of just collecting interesting names.
 
 3. **A multi-agent operating model**
    - Alpha collects and verifies evidence.
@@ -43,9 +43,9 @@ Most AI investing tools try to recommend stocks. Thesis OS takes a different rou
    - Reduce the common failure mode where research accumulates but becomes hard for humans and agents to retrieve.
 
 5. **A runnable starter kit**
-   - No-key public stock-data quickstart.
+   - Guaranteed offline stock quickstart with optional no-key live Yahoo/Stooq mode.
    - CSV-backed quantitative screener.
-   - Sample thesis card, decision card, prediction ledger, feedback evaluator, vault notes, dashboard, and GitHub Actions CI.
+   - Sample thesis card, decision card, prediction ledger, rolling screener feedback, vault notes, dashboard, and GitHub Actions CI.
 
 ## What You Can Try Today
 
@@ -53,7 +53,8 @@ No broker credentials, private chats, or paid feeds are required for the public 
 
 | Goal | Start Here | Result |
 |---|---|---|
-| Run a no-key public stock loop | `thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY` | Public price data -> quant screener -> thesis card -> prediction -> forward-return feedback -> dashboard |
+| Run the guaranteed stock loop | `thesis-os quickstart-stock --out ./quickstart_run` | Bundled sample CSV -> quant screener -> thesis card -> prediction -> rolling forward-return feedback -> dashboard |
+| Run no-key live public data | `thesis-os quickstart-stock --out ./quickstart_live --live --tickers NVDA,AAPL,MSFT --benchmark SPY` | Yahoo chart data with Stooq fallback -> same judgment loop |
 | See the cockpit | `open ./quickstart_run/vault/dashboard/index.html` | A static review surface for theses, watchlists, actions, predictions, and feedback |
 | Run the fully offline synthetic demo | `thesis-os demo --out ./demo_run` | Local DB, vault notes, sample thesis card, decision card, prediction ledger, feedback notes, and dashboard |
 | Inspect realistic outputs | [`examples/sample_outputs/`](examples/sample_outputs/) | Public-safe thesis card, Top 5 deep dive, concentration strategy, screener results, screener feedback, and social collection |
@@ -94,7 +95,7 @@ Thesis OS does not need to own the data layer. There are already many excellent 
 | Macro and supply-chain proxy | FRED, central banks, statistical agencies, customs/export-import APIs | regime evidence, sector proxy evidence, risk checks |
 | Alternative public datasets | Nasdaq Data Link free datasets, Hugging Face datasets, Kaggle datasets with compatible licenses | thematic research, classifiers, event datasets |
 
-The default quickstart uses a no-key public Yahoo Finance chart endpoint to prove the loop. Serious users can replace that adapter with OpenBB, FinanceDataReader, pykrx, EDGAR/DART, broker exports, licensed datasets, or their own research database. Always check license, delay, redistribution, corporate-action adjustment, and survivorship-bias rules before production use. See [Public Data Sources](docs/public-data-sources.md).
+The default quickstart uses a bundled sample price CSV so the first run succeeds even when public endpoints rate-limit shared IPs. Use `--live` to fetch no-key Yahoo Finance chart data with Stooq fallback. Serious users can replace that adapter with OpenBB, FinanceDataReader, pykrx, EDGAR/DART, broker exports, licensed datasets, or their own research database. Always check license, delay, redistribution, corporate-action adjustment, and survivorship-bias rules before production use. See [Public Data Sources](docs/public-data-sources.md).
 
 ## Run It In 60 Seconds
 
@@ -104,10 +105,20 @@ cd thesis-investment-os
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+thesis-os quickstart-stock --out ./quickstart_run
 ```
 
-The quickstart uses public no-key daily stock data by default. It creates a local SQLite DB, markdown vault, quantitative screener candidates, thesis card, decision card, prediction ledger, forward-return feedback notes, wiki/SSOT notes, and a static dashboard at `quickstart_run/vault/dashboard/index.html`.
+The quickstart uses a bundled sample CSV by default, so it works without network access. It creates a local SQLite DB, markdown vault, quantitative screener candidates, thesis card, decision card, prediction ledger, rolling forward-return feedback notes, wiki/SSOT notes, and a static dashboard at `quickstart_run/vault/dashboard/index.html`.
+
+It also writes `quickstart_run/vault/feedback/quickstart-rolling-walk-forward.md` and `quickstart_run/quickstart_rolling_walk_forward.json`, which report rolling windows, candidate observations, hit rate, average excess return, best/worst excess return, and the per-window candidate table. The bundled sample numbers are a loop demonstration, not an alpha claim.
+
+Want live no-key public data instead?
+
+```bash
+thesis-os quickstart-stock --out ./quickstart_live --live --tickers NVDA,AAPL,MSFT --benchmark SPY
+```
+
+Live mode uses Yahoo chart data first, retries transient failures such as `429`/`503`, and falls back to Stooq when possible. For production research, bring a more reliable licensed or public data adapter.
 
 Prefer a fully offline run? Use `thesis-os demo --out ./demo_run` to generate synthetic public-safe sample data.
 
@@ -230,6 +241,28 @@ Arki maintains the operating system.
 - Migration logs
 - Agent skill governance
 
+## Runtime And OpenClaw
+
+Thesis OS is the investment-domain core. It can run from the CLI, cron, launchd, systemd, GitHub Actions, OpenClaw, or a custom app.
+
+The original long-running deployment runs on **OpenClaw**, which acts as a reference runtime:
+
+- persistent Alpha, Lattice, and Arki agents
+- local skills and model routing
+- Telegram or chat gateways
+- recurring jobs and heartbeats
+- memory capture and promotion
+- vault writes, logs, and recovery notes
+
+In other words:
+
+```text
+Thesis OS = thesis / evidence / action / prediction / feedback core
+OpenClaw  = long-running local agent runtime for operating that core
+```
+
+OpenClaw is not required for the quickstart, but it shows how the same loop can run continuously as a local multi-agent system. See [Runtime Adapters](docs/runtime-adapters.md), [OpenClaw Reference Runtime](docs/openclaw-reference-runtime.md), and [`examples/openclaw/`](examples/openclaw/).
+
 ## What This Repository Provides
 
 This repository is the open-source core. It intentionally excludes broker credentials, private portfolio data, real Telegram channel IDs, Gmail contents, cookies, OAuth sessions, and paid raw data.
@@ -244,6 +277,7 @@ The included features are organized around the judgment loop, not around isolate
 | **Judgment layer** | Thesis card generation, decision cards, devil's advocate pattern, action queue, prediction ledger, Lattice roundtable, concentrated strategy sample, and judgment feedback loop | Turns evidence into reviewable portfolio/watchlist decisions with invalidation and measurable outcomes |
 | **Memory and vault governance** | Memory management process, markdown vault generation, document policy pattern, codeowner/canonical-path governance, vault wiki index, and SSOT note generation | Keeps research retrievable and current for both humans and agents |
 | **Automation harness** | Recurring job manifest, harness contract schema, ownership/input/output/delivery/failure-policy validator, health checks, and GitHub Actions CI | Makes the system operable as a repeatable workflow rather than a pile of scripts |
+| **Runtime adapters** | Runtime boundary docs, OpenClaw reference runtime docs, and public-safe OpenClaw agent/job examples | Lets users run Thesis OS as a simple CLI project or as a persistent local agent system |
 | **Human review surface** | Static HTML dashboard cockpit and public-safe sample output pack for thesis cards, nightly screening, concentrated strategy, screener feedback, and social collection | Lets users inspect the loop visually before attaching private data or real adapters |
 
 Excluded:
@@ -251,6 +285,7 @@ Excluded:
 - Real account data
 - Real brokerage/session adapters
 - Private vault contents
+- Private OpenClaw runtime state
 - API keys and secrets
 - User-specific chat history
 
@@ -344,10 +379,10 @@ cd thesis-investment-os
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e .
-thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+thesis-os quickstart-stock --out ./quickstart_run
 ```
 
-The no-key public quickstart creates:
+The guaranteed quickstart creates:
 
 <p align="center">
   <img src="docs/assets/demo-workspace-tree.svg" alt="Thesis OS demo workspace tree" width="85%">
@@ -367,7 +402,7 @@ The no-key public quickstart creates:
 You can also run without installing:
 
 ```bash
-python -m thesis_os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+python -m thesis_os quickstart-stock --out ./quickstart_run
 python -m thesis_os demo --out ./demo_run
 python -m thesis_os lint --root .
 ```
@@ -378,6 +413,8 @@ Agent-specific commands:
 python -m thesis_os arki init --workspace ./workspace
 python -m thesis_os quickstart-stock --out ./quickstart_run \
   --tickers NVDA,AAPL,MSFT --benchmark SPY
+python -m thesis_os quickstart-stock --out ./quickstart_live \
+  --live --tickers NVDA,AAPL,MSFT --benchmark SPY
 python -m thesis_os alpha sample-collect --workspace ./workspace
 python -m thesis_os alpha run-screener --workspace ./workspace
 python -m thesis_os alpha run-quant-screener --workspace ./workspace \

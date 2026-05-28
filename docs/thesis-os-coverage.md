@@ -10,9 +10,9 @@ It is intentionally public-safe. It describes reusable architecture and contract
 |---|---|---|
 | Three-agent model | Reflected | Alpha, Lattice, Arki docs and CLI |
 | Thesis / evidence / action / prediction / feedback loop | Reflected | schemas, demo CLI, vault notes, feedback commands |
-| No-key public stock quickstart | Reflected | `thesis-os quickstart-stock` uses public daily price data or a local price CSV to run screener -> thesis -> prediction -> feedback |
+| Stock quickstart and live data option | Reflected | `thesis-os quickstart-stock` defaults to a bundled sample CSV and supports `--live` Yahoo/Stooq or a local price CSV to run screener -> thesis -> prediction -> rolling feedback |
 | Public data-source strategy | Reflected | `docs/public-data-sources.md` documents how to plug in Stooq, FinanceDataReader, OpenBB, pykrx, SEC/DART, FRED, customs APIs, and compatible public datasets |
-| Quant screeners and Top 5 discovery | Reflected | Research OS-style CSV-backed quant stack; `alpha discover` uses social/report signals only as context overlays |
+| Quant screeners and Top 5 discovery | Reflected | Thesis OS-style CSV-backed quant stack; `alpha discover` uses social/report signals only as context overlays |
 | Local listed-equity database refresh | Reflected | CSV-backed KR/US market snapshot adapter |
 | Intraday holdings/watchlist monitor | Reflected | CSV-backed alert adapter |
 | Thesis and portfolio cockpit | Reflected | `arki build-dashboard` static HTML dashboard |
@@ -23,6 +23,7 @@ It is intentionally public-safe. It describes reusable architecture and contract
 | Recurring jobs | Reflected | recurring job docs and sample manifest |
 | Skill catalog | Reflected | skills/pipelines docs and sample catalog |
 | Harness contracts / output delivery | Reflected | harness contract schema, sample JSON, validator command |
+| Runtime adapters and OpenClaw reference runtime | Reflected | `docs/runtime-adapters.md`, `docs/openclaw-reference-runtime.md`, and `examples/openclaw/` |
 | Customs / trade proxy data layer | Reflected | CSV-backed trade proxy command and schema |
 | Official filings / SEC-style adapters | Partially reflected | adapter contracts only; private integrations remain deployment-specific |
 | Authenticated social/video/email collectors | Partially reflected | skill contracts only; sessions stay private |
@@ -37,7 +38,7 @@ It is intentionally public-safe. It describes reusable architecture and contract
 Users can run a public-data loop without broker credentials:
 
 ```bash
-thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+thesis-os quickstart-stock --out ./quickstart_run
 ```
 
 It fetches or accepts public price history, creates market and screener CSV adapters, writes evidence to the local DB/vault, builds a thesis and decision card, registers a prediction, evaluates historical forward returns, builds the wiki/SSOT notes, and exports the dashboard.
@@ -65,7 +66,20 @@ Public implementation:
 - `examples/sample_harness_contracts.json`
 - `thesis-os arki validate-harness`
 
-### 3. Customs / Trade Proxy Evidence
+### 3. Runtime Adapters And OpenClaw
+
+Thesis OS can run as CLI commands, scheduled jobs, GitHub Actions, OpenClaw agents, or a custom app.
+
+Public implementation:
+
+- `docs/runtime-adapters.md`
+- `docs/openclaw-reference-runtime.md`
+- `examples/openclaw/sample_agents.yaml`
+- `examples/openclaw/sample_harness_contract.yaml`
+
+The public core remains usable without OpenClaw. OpenClaw documents how the same loop can be hosted as a persistent local multi-agent system.
+
+### 4. Customs / Trade Proxy Evidence
 
 Some investment theses need non-price evidence such as export-import, customs, or supply-chain proxy data.
 
@@ -77,7 +91,7 @@ Public implementation:
 
 The public version is CSV-backed. Private deployments can replace CSV input with official APIs or paid shipment data while preserving the same output contract.
 
-### 4. Dashboard Cockpit
+### 5. Dashboard Cockpit
 
 Users need to see thesis cards, watchlist state, portfolio-oriented actions, and performance feedback in one place.
 

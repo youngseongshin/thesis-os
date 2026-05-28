@@ -12,7 +12,7 @@ from thesis_os.alpha.evidence_builder import event_to_evidence, ingest_csv_to_wo
 from thesis_os.alpha.intraday_monitor import run_intraday_monitor
 from thesis_os.alpha.local_db import connect, init_db, insert_evidence, list_evidence, list_screener_candidates
 from thesis_os.alpha.market_db import run_market_db_refresh
-from thesis_os.alpha.public_stock_quickstart import DEFAULT_BENCHMARK, DEFAULT_TICKERS, run_stock_quickstart
+from thesis_os.alpha.public_stock_quickstart import DEFAULT_BENCHMARK, DEFAULT_ROLLING_STEP_DAYS, DEFAULT_ROLLING_WINDOWS, DEFAULT_TICKERS, run_stock_quickstart
 from thesis_os.alpha.quant_screener import run_quant_screener
 from thesis_os.alpha.screener import run_sample_screener
 from thesis_os.alpha.trade_proxy import run_trade_proxy
@@ -42,7 +42,7 @@ def main(argv: list[str] | None = None) -> int:
     demo_parser = sub.add_parser("demo", help="Generate a runnable sample Thesis OS loop.")
     demo_parser.add_argument("--out", default="./demo_run", help="Output directory.")
 
-    stock_parser = sub.add_parser("quickstart-stock", help="Run a no-key public stock-data screener -> thesis -> feedback loop.")
+    stock_parser = sub.add_parser("quickstart-stock", help="Run a stock-data screener -> thesis -> feedback loop.")
     stock_parser.add_argument("--out", default="./quickstart_run", help="Output directory.")
     stock_parser.add_argument(
         "--tickers",
@@ -52,10 +52,17 @@ def main(argv: list[str] | None = None) -> int:
     stock_parser.add_argument("--benchmark", default=DEFAULT_BENCHMARK, help="Benchmark ticker. Default: SPY.")
     stock_parser.add_argument("--top-n", type=int, default=5, help="Number of screener candidates to keep.")
     stock_parser.add_argument("--horizon-days", type=int, default=63, help="Historical forward-return horizon in trading days.")
+    stock_parser.add_argument("--rolling-windows", type=int, default=DEFAULT_ROLLING_WINDOWS, help="Number of historical anchor windows for rolling feedback.")
+    stock_parser.add_argument("--rolling-step-days", type=int, default=DEFAULT_ROLLING_STEP_DAYS, help="Trading-day gap between rolling feedback anchor windows.")
+    stock_parser.add_argument(
+        "--live",
+        action="store_true",
+        help="Fetch live no-key Yahoo/Stooq public data. Default uses a bundled sample CSV so first run always succeeds.",
+    )
     stock_parser.add_argument(
         "--price-csv",
         default="",
-        help="Optional local CSV with ticker,date,open,high,low,close,volume for offline or custom data.",
+        help="Optional local CSV with ticker,date,open,high,low,close,volume. Overrides the bundled sample and live mode.",
     )
 
     init_parser = sub.add_parser("init", help="Initialize a local Thesis OS workspace.")
@@ -157,6 +164,9 @@ def main(argv: list[str] | None = None) -> int:
             top_n=args.top_n,
             horizon_days=args.horizon_days,
             price_csv=args.price_csv or None,
+            live=args.live,
+            rolling_windows=args.rolling_windows,
+            rolling_step_days=args.rolling_step_days,
         )
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0

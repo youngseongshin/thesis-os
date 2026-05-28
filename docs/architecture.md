@@ -12,6 +12,22 @@ Quant + qualitative sources
   -> Arki system maintenance
 ```
 
+## Runtime Boundary
+
+Thesis OS defines the investment judgment core. It does not require a specific agent runtime.
+
+The same core can be executed by:
+
+- CLI commands
+- cron / launchd / systemd jobs
+- GitHub Actions
+- OpenClaw
+- a custom application or service
+
+The original long-running deployment uses OpenClaw as the reference runtime. OpenClaw supplies persistent agents, chat gateways, local skills, recurring jobs, memory promotion, logs, and recovery workflows. Thesis OS supplies the schemas, local DB, vault notes, screeners, thesis cards, prediction ledger, feedback reports, and dashboard.
+
+See [Runtime Adapters](runtime-adapters.md) and [OpenClaw Reference Runtime](openclaw-reference-runtime.md).
+
 ## Layers
 
 ### Data Sources

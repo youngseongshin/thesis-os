@@ -11,7 +11,7 @@ from thesis_os.models import Evidence, utc_now
 def run_trade_proxy(workspace: str | Path, input_csv: str | Path, proxy_name: str = "trade_proxy") -> dict[str, object]:
     """Build a public-safe trade/customs proxy report from a CSV adapter.
 
-    This models the live Research OS customs layer without bundling private API
+    This models the live Thesis OS customs layer without bundling private API
     keys or country-specific authenticated adapters. Private deployments can
     replace the CSV with an official customs API adapter while keeping the same
     output contract.

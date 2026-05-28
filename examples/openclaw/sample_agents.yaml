@@ -1,0 +1,73 @@
+# Public-safe OpenClaw reference runtime map for Thesis OS.
+#
+# This is not a runnable private deployment file. It documents how Alpha,
+# Lattice, and Arki can be hosted by a long-running OpenClaw-style runtime.
+
+runtime: openclaw
+project: thesis-os
+public_sanitized: true
+
+agents:
+  - id: alpha
+    role: evidence_agent
+    mission: "Collect, normalize, and verify evidence before judgment."
+    owns:
+      - evidence_records
+      - market_snapshots
+      - screener_candidates
+      - intraday_alerts
+      - source_quality_notes
+    typical_skills:
+      - alpha-quant-screener-stack
+      - alpha-real-time-market-monitor
+      - alpha-social-collector
+      - alpha-youtube-scout
+      - alpha-semiconductor-specialist
+    forbidden:
+      - "make final portfolio decisions"
+      - "store private raw messages in public outputs"
+
+  - id: lattice
+    role: judgment_agent
+    korean_name: "격자"
+    mission: "Turn evidence into thesis, action, prediction, and feedback."
+    owns:
+      - thesis_registry
+      - decision_cards
+      - action_queue
+      - prediction_ledger
+      - feedback_interpretation
+    typical_skills:
+      - lattice-devil-advocate
+      - lattice-roundtable
+      - lattice-screener-feedback
+    forbidden:
+      - "rubber-stamp screener candidates"
+      - "rewrite prior predictions after outcomes are known"
+
+  - id: arki
+    role: architect_agent
+    mission: "Keep the Thesis OS runtime healthy, auditable, and recoverable."
+    owns:
+      - schemas
+      - vault_policy
+      - recurring_jobs
+      - harness_contracts
+      - wiki_index
+      - system_health
+    typical_skills:
+      - arki-vault-governance
+      - arki-harness-validation
+      - arki-health-check
+    forbidden:
+      - "make investment calls"
+      - "commit credentials or private runtime state"
+
+delivery_surfaces:
+  - vault
+  - local_db
+  - dashboard
+  - optional_chat_gateway
+
+secret_policy:
+  rule: "All tokens, cookies, broker sessions, OAuth state, and chat IDs stay outside the public repo."

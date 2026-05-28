@@ -16,7 +16,7 @@ The quant data plane collects structured market and company data.
 
 ## Public Sources Are First-Class Inputs
 
-The public core starts with a no-key Yahoo Finance chart endpoint, but Thesis OS is intentionally adapter-based. Users can plug in strong public and open analysis sources such as:
+The public core starts with a bundled sample CSV so the first run always succeeds, plus an optional no-key Yahoo/Stooq live adapter. Thesis OS is intentionally adapter-based. Users can plug in strong public and open analysis sources such as:
 
 - OpenBB and FinanceDataReader for broad market data workflows
 - pykrx and KRX-derived files for Korea listed-equity research

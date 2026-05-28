@@ -1,6 +1,6 @@
 # Public Data Sources
 
-Thesis OS is built as a data-source agnostic framework. The public repository ships a no-key Yahoo Finance chart quickstart and CSV adapters, but a serious deployment should plug in the best public or licensed data sources available to the user.
+Thesis OS is built as a data-source agnostic framework. The public repository ships a guaranteed bundled sample CSV quickstart, optional no-key Yahoo/Stooq live mode, and CSV adapters. A serious deployment should plug in the best public or licensed data sources available to the user.
 
 The point is not to make Thesis OS the only data provider. The point is to make good data auditable once it enters the loop: evidence -> screener candidate -> thesis -> prediction -> feedback.
 
@@ -26,7 +26,7 @@ raw source -> adapter -> Evidence / MarketSnapshot / ScreenerCandidate -> Vault 
 
 For example:
 
-- A no-key user can run `thesis-os quickstart-stock` with the public Yahoo Finance chart endpoint or a local price CSV.
+- A first-time user can run `thesis-os quickstart-stock` with the bundled sample CSV, then add `--live` for no-key Yahoo/Stooq public data or `--price-csv` for their own dataset.
 - A quant user can replace the default CSV with OpenBB, FinanceDataReader, pykrx, or their own research database.
 - A fundamental investor can add SEC/DART filings as evidence before Lattice builds thesis cards.
 - A supply-chain investor can add customs or export/import proxy data as sector evidence.

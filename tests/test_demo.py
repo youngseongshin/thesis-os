@@ -57,6 +57,32 @@ class DemoTest(unittest.TestCase):
             self.assertTrue((workspace / "vault" / "dashboard" / "index.html").exists())
             self.assertTrue((workspace / "vault" / "theses" / "THESIS-QUICKSTART-NVDA.md").exists())
             self.assertTrue(any((workspace / "vault" / "feedback").glob("*_screener_feedback.md")))
+            self.assertTrue((workspace / "vault" / "feedback" / "quickstart-rolling-walk-forward.md").exists())
+            self.assertTrue((workspace / "quickstart_rolling_walk_forward.json").exists())
+
+    def test_public_stock_quickstart_defaults_to_bundled_sample_csv(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = Path(tmp) / "quickstart"
+            self.assertEqual(
+                main(
+                    [
+                        "quickstart-stock",
+                        "--out",
+                        str(workspace),
+                        "--top-n",
+                        "3",
+                        "--horizon-days",
+                        "21",
+                    ]
+                ),
+                0,
+            )
+            self.assertTrue((workspace / "quickstart_sample_prices.csv").exists())
+            self.assertTrue((workspace / "vault" / "feedback" / "quickstart-rolling-walk-forward.md").exists())
+            manifest = (workspace / "quickstart_manifest.json").read_text(encoding="utf-8")
+            self.assertIn('"source": "bundled_sample_csv"', manifest)
+            self.assertIn('"rolling_result"', manifest)
+            self.assertNotIn('"observations"', manifest)
 
     def _write_price_csv(self, path: Path) -> None:
         lines = ["ticker,date,open,high,low,close,volume"]
@@ -87,7 +113,7 @@ class DemoTest(unittest.TestCase):
                 )
         path.write_text("\n".join(lines), encoding="utf-8")
 
-    def test_quant_screener_uses_numeric_researchos_stack(self) -> None:
+    def test_quant_screener_uses_numeric_thesisos_stack(self) -> None:
         rows = [
             {
                 "ticker": "AI-INFRA",
@@ -130,7 +156,9 @@ class DemoTest(unittest.TestCase):
             "docs/dashboard-cockpit.md",
             "docs/domain-specialist-skills.md",
             "docs/memory-management.md",
+            "docs/openclaw-reference-runtime.md",
             "docs/recurring-jobs.md",
+            "docs/runtime-adapters.md",
             "docs/sample-output-pack.md",
             "docs/skills-and-pipelines.md",
             "docs/thesis-os-coverage.md",
@@ -147,6 +175,8 @@ class DemoTest(unittest.TestCase):
             "examples/sample_outputs/screener-discovery-results.md",
             "examples/sample_outputs/screener-performance-feedback.md",
             "examples/sample_outputs/social-collection-summary.md",
+            "examples/openclaw/sample_agents.yaml",
+            "examples/openclaw/sample_harness_contract.yaml",
         ]
         for rel_path in required:
             path = root / rel_path

@@ -25,10 +25,10 @@ public/owned market data adapter
 The fastest public demonstration is:
 
 ```bash
-thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+thesis-os quickstart-stock --out ./quickstart_run
 ```
 
-This uses public price history to create a screener candidate and then immediately evaluates a historical forward-return horizon. Replace the price adapter with OpenBB, FinanceDataReader, pykrx, a broker export, or an internal research database when richer data is available.
+This uses a bundled sample price CSV to create screener candidates and immediately evaluates historical forward-return horizons, including rolling walk-forward feedback. Add `--live` for no-key Yahoo/Stooq public data. Replace the price adapter with OpenBB, FinanceDataReader, pykrx, a broker export, or an internal research database when richer data is available.
 
 ## Why This Matters
 
@@ -67,6 +67,8 @@ Many investment systems stop at "this looks interesting." Thesis OS requires one
 - absolute return
 - benchmark-relative return
 - hit rate
+- rolling walk-forward hit rate
+- average excess return
 - maximum favorable excursion
 - maximum adverse excursion
 - failure mode

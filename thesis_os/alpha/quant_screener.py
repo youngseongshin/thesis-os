@@ -125,7 +125,7 @@ def build_quant_candidates(rows: list[dict[str, str]], top_n: int = 20) -> list[
 def score_quant_row(row: dict[str, Any]) -> float:
     """Public CSV implementation inspired by Alpha's current KR screener stack.
 
-    The real Research OS treats screener membership as the core signal:
+    The real Thesis OS treats screener membership as the core signal:
     Quality Compounder, Smart Money Quality, Cycle Rerating, Smart Money
     Earnings/PEAD, consensus revision, RS80 not-late leadership, and market
     surface overlays. This public adapter keeps the same shape while accepting
@@ -192,7 +192,7 @@ def quant_summary_markdown(candidates: list[ScreenerCandidate]) -> str:
     lines = [
         "This file is generated from a public CSV adapter for Alpha-style quantitative screeners.",
         "",
-        "## Research OS-Style Quant Stack",
+        "## Thesis OS-Style Quant Stack",
         "- KR Meta Screener: treats membership in quality, smart-money, cycle, earnings, PEAD, consensus, and RS80 source sets as the primary signal.",
         "- Factor Profiles: reproduces public-safe versions of Quality Compounder, Smart Money Quality/Value/Earnings, Value Quality, and Cycle Rerating scores.",
         "- RS80 Not-Late: keeps leadership but penalizes late-stage extension, wide boxes, and chase risk.",
@@ -234,7 +234,7 @@ def quant_rationale(features: dict[str, float | int | str]) -> str:
     if risk >= 0.70 or extension >= 0.75:
         return "Quantitative source overlap exists, but extension/risk overlays are elevated. Keep below active promotion until timing improves."
     if source_count >= 3 and len(channel) >= 2:
-        return "Multiple Research OS-style quantitative screeners agree. Send to Lattice for thesis and portfolio-inclusion review."
+        return "Multiple Thesis OS-style quantitative screeners agree. Send to Lattice for thesis and portfolio-inclusion review."
     if channel:
         return "One quantitative pillar is strong. Keep as a candidate until source overlap or factor breadth improves."
     return "Weak or mixed quantitative evidence. Keep below the active portfolio review queue."

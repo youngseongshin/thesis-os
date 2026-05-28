@@ -37,7 +37,18 @@ Required behavior:
 - return a delivery result
 - never log credentials
 
+## RuntimeAdapter
+
+Use for hosting Thesis OS commands inside a long-running runtime such as OpenClaw, cron, launchd, GitHub Actions, or a custom app.
+
+Required behavior:
+
+- execute Thesis OS commands with explicit inputs and outputs
+- keep secrets outside the public repository
+- write durable logs or run notes
+- preserve previous valid outputs on failure
+- avoid changing the object model for `Evidence`, `Thesis`, `Action`, `Prediction`, and `Feedback`
+
 ## Private Adapter Rule
 
 Real broker APIs, Telegram sessions, browser cookies, Gmail OAuth, and paid feeds should live in private repositories or local runtime directories.
-

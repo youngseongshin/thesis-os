@@ -29,7 +29,7 @@ Thesis OS is not:
 ## Launch Checklist
 
 - README explains the loop in under one minute.
-- A no-key public-stock quickstart runs without broker credentials or paid feeds.
+- A guaranteed sample stock quickstart runs without broker credentials, paid feeds, or network access; optional `--live` mode demonstrates no-key public data.
 - Public data sources are positioned as pluggable inputs, not bundled proprietary datasets.
 - Screener feedback is visible as the core accountability mechanism.
 - CI passes.

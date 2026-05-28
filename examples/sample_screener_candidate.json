@@ -2,7 +2,7 @@
   "id": "SCR-AI-INFRA-001",
   "entity": "AI Infrastructure Basket",
   "ticker": "AI-INFRA",
-  "screener_name": "sample_researchos_meta_quant",
+  "screener_name": "sample_thesisos_meta_quant",
   "as_of_date": "2026-01-31",
   "score": 0.6547,
   "features": {

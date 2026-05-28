@@ -1,0 +1,74 @@
+# Public-safe example of how an OpenClaw runtime could schedule Thesis OS work.
+#
+# Real deployments should keep secrets, channel IDs, OAuth sessions, and broker
+# credentials in local runtime configuration, never in the public repo.
+
+runtime: openclaw
+project: thesis-os
+public_sanitized: true
+
+contracts:
+  - id: openclaw.alpha.market-refresh.v1
+    owner_agent: alpha
+    trigger: "market close"
+    command: "thesis-os alpha refresh-market-db --workspace ./workspace --input-csv ./market_snapshots.csv"
+    inputs:
+      - market_data_adapter
+      - listed_equity_universe
+    outputs:
+      - local/thesis_os.db
+      - vault/evidence/market-db-refresh.md
+    delivery:
+      - vault
+      - optional_chat_summary
+    failure_policy: "log failure, keep previous snapshot, alert Arki"
+
+  - id: openclaw.alpha.screener-discovery.v1
+    owner_agent: alpha
+    trigger: "after market refresh"
+    command: "thesis-os alpha run-quant-screener --workspace ./workspace --input-csv ./quant_features.csv --top-n 20"
+    inputs:
+      - quant_feature_table
+      - source_quality_state
+    outputs:
+      - local screener_candidates
+      - vault/screeners/quant-screener-top.md
+    delivery:
+      - vault
+      - optional_chat_summary
+    failure_policy: "log failure and do not promote stale candidates"
+
+  - id: openclaw.lattice.roundtable.v1
+    owner_agent: lattice
+    trigger: "after evidence and screener refresh"
+    command: "thesis-os lattice roundtable --workspace ./workspace"
+    inputs:
+      - thesis_registry
+      - screener_candidates
+      - market_snapshots
+      - feedback_memory
+    outputs:
+      - vault/decisions/daily-roundtable-sample.md
+      - action_queue.json
+    delivery:
+      - vault
+      - optional_chat_summary
+    failure_policy: "preserve previous decision note and mark stale"
+
+  - id: openclaw.arki.wiki-dashboard.v1
+    owner_agent: arki
+    trigger: "after judgment and feedback jobs"
+    command: "thesis-os arki build-wiki-index --workspace ./workspace && thesis-os arki build-dashboard --workspace ./workspace"
+    inputs:
+      - vault
+      - local/thesis_os.db
+      - action_queue
+      - prediction_ledger
+    outputs:
+      - vault/wiki/index.md
+      - vault/ssot/canonical-locations.md
+      - vault/dashboard/index.html
+    delivery:
+      - vault
+      - dashboard
+    failure_policy: "keep previous index/dashboard and write health finding"

@@ -38,10 +38,10 @@ collect evidence
 -> update the process
 ```
 
-The first public quickstart uses no-key public stock data to show the loop end to end:
+The first public quickstart uses bundled sample stock data so the loop works even when public endpoints rate-limit a shared IP:
 
 ```bash
-thesis-os quickstart-stock --out ./quickstart_run --tickers NVDA,AAPL,MSFT --benchmark SPY
+thesis-os quickstart-stock --out ./quickstart_run
 ```
 
 It is not a trading signal. It is a working example of how a stock screener becomes accountable.
@@ -74,7 +74,7 @@ Thesis OS is useful if you want to build your own research system and need:
 
 - a thesis/evidence/action/prediction/feedback object model
 - a CSV-backed quantitative screener
-- a no-key public stock quickstart
+- a guaranteed sample stock quickstart with optional no-key live public data
 - markdown vault notes
 - SQLite local storage
 - a prediction ledger

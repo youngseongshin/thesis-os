@@ -9,7 +9,7 @@ source_policy: synthetic_example
 
 This folder shows what a public-safe Thesis OS deployment can produce.
 
-The examples are synthetic. They are inspired by the shape of a live Research OS, but they do not contain real portfolio holdings, private channel data, account data, paid-feed data, raw messages, or non-public company information.
+The examples are synthetic. They are inspired by the shape of a live Thesis OS, but they do not contain real portfolio holdings, private channel data, account data, paid-feed data, raw messages, or non-public company information.
 
 Use these examples to understand the operating loop:
 

@@ -3,10 +3,12 @@ from __future__ import annotations
 import csv
 import json
 import math
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from statistics import pstdev
 from typing import Iterable
@@ -14,7 +16,7 @@ from typing import Iterable
 from thesis_os.alpha.evidence_builder import ingest_evidence_to_workspace
 from thesis_os.alpha.local_db import connect, init_db, list_screener_candidates
 from thesis_os.alpha.market_db import run_market_db_refresh
-from thesis_os.alpha.quant_screener import run_quant_screener
+from thesis_os.alpha.quant_screener import build_quant_candidates, run_quant_screener
 from thesis_os.arki.dashboard import build_dashboard
 from thesis_os.arki.vault_writer import VaultWriter
 from thesis_os.arki.wiki_index import build_wiki_index
@@ -28,8 +30,11 @@ from thesis_os.models import Action, Evidence, Prediction, Thesis, utc_now
 from thesis_os.runtime.workspace import init_workspace
 
 
-DEFAULT_TICKERS = ["NVDA", "AAPL", "MSFT", "TSM", "AVGO"]
+DEFAULT_TICKERS = ["NVDA", "AAPL", "MSFT"]
 DEFAULT_BENCHMARK = "SPY"
+DEFAULT_ROLLING_WINDOWS = 6
+DEFAULT_ROLLING_STEP_DAYS = 21
+HTTP_USER_AGENT = "Mozilla/5.0 (compatible; ThesisOS/0.5; +https://github.com/youngseongshin/thesis-investment-os)"
 
 
 @dataclass(frozen=True)
@@ -50,12 +55,16 @@ def run_stock_quickstart(
     top_n: int = 5,
     horizon_days: int = 63,
     price_csv: str | Path | None = None,
+    live: bool = False,
+    rolling_windows: int = DEFAULT_ROLLING_WINDOWS,
+    rolling_step_days: int = DEFAULT_ROLLING_STEP_DAYS,
 ) -> dict[str, object]:
-    """Run a no-key public-price-data thesis loop.
+    """Run a public-safe stock-price-data thesis loop.
 
-    The default source is a no-key public Yahoo Finance chart endpoint. Tests
-    and offline users can pass a local `ticker,date,open,high,low,close,volume`
-    CSV.
+    The default source is a bundled sample CSV so the quickstart succeeds even
+    on CI, airplanes, corporate networks, and rate-limited shared IPs. Pass
+    `live=True` to fetch no-key Yahoo/Stooq public data, or pass a local
+    `ticker,date,open,high,low,close,volume` CSV.
     """
     workspace = Path(workspace)
     init_workspace(workspace)
@@ -63,7 +72,13 @@ def run_stock_quickstart(
     benchmark = benchmark.strip().upper() or DEFAULT_BENCHMARK
     symbols = list(dict.fromkeys([*tickers, benchmark]))
 
-    histories = load_price_histories(symbols, price_csv=price_csv)
+    user_price_csv = price_csv is not None
+    if price_csv is None and not live:
+        price_csv = workspace / "quickstart_sample_prices.csv"
+        _write_default_sample_price_csv(Path(price_csv), symbols)
+    source_label = "local_csv" if user_price_csv else ("public_live_yahoo_stooq" if live else "bundled_sample_csv")
+
+    histories = load_price_histories(symbols, price_csv=price_csv, live=live)
     missing = [symbol for symbol in symbols if symbol not in histories or len(histories[symbol]) < horizon_days + 30]
     if missing:
         raise RuntimeError(f"not enough public price history for: {', '.join(missing)}")
@@ -84,6 +99,17 @@ def run_stock_quickstart(
 
     market_result = run_market_db_refresh(workspace, market_csv)
     screener_result = run_quant_screener(workspace, quant_csv, top_n=top_n)
+    rolling_result = rolling_walk_forward_summary(
+        histories=histories,
+        tickers=tickers,
+        benchmark=benchmark,
+        horizon_days=horizon_days,
+        top_n=top_n,
+        window_count=rolling_windows,
+        step_days=rolling_step_days,
+    )
+    rolling_observations_path = workspace / "quickstart_rolling_walk_forward.json"
+    rolling_observations_path.write_text(json.dumps(rolling_result, indent=2, ensure_ascii=False), encoding="utf-8")
 
     conn = connect(workspace / "local" / "thesis_os.db")
     init_db(conn)
@@ -172,15 +198,30 @@ def run_stock_quickstart(
             "source_policy": "public_price_history",
         },
     )
+    rolling_feedback_path = vault.write_note(
+        "feedback/quickstart-rolling-walk-forward.md",
+        title="Quickstart Rolling Walk-Forward Feedback",
+        body=rolling_summary_markdown(rolling_result),
+        frontmatter={
+            "generated_at": utc_now(),
+            "type": "rolling_walk_forward_feedback",
+            "source_policy": source_label,
+            "horizon_days": horizon_days,
+            "window_count": rolling_result["window_count"],
+            "observation_count": rolling_result["observation_count"],
+            "hit_rate": rolling_result["hit_rate"],
+            "average_excess_return": rolling_result["average_excess_return"],
+        },
+    )
 
     quickstart_summary_path = vault.write_note(
         "evidence/public-stock-quickstart.md",
         title="Public Stock Quickstart",
-        body=_quickstart_summary_markdown(rows, candidates, benchmark, horizon_days),
+        body=_quickstart_summary_markdown(rows, candidates, benchmark, horizon_days, rolling_result, source_label),
         frontmatter={
             "generated_at": utc_now(),
             "type": "public_stock_quickstart",
-            "source": "local_csv" if price_csv else "yahoo_finance_chart_public",
+            "source": source_label,
             "as_of_date": as_of_date,
             "latest_date": latest_date,
         },
@@ -192,7 +233,7 @@ def run_stock_quickstart(
         "workspace": str(workspace),
         "tickers": tickers,
         "benchmark": benchmark,
-        "source": "local_csv" if price_csv else "yahoo_finance_chart_public",
+        "source": source_label,
         "as_of_date": as_of_date,
         "latest_date": latest_date,
         "horizon_days": horizon_days,
@@ -201,9 +242,12 @@ def run_stock_quickstart(
         "thesis_path": str(thesis_path),
         "decision_path": str(decision_path),
         "prediction_feedback_path": str(prediction_feedback_path),
+        "rolling_feedback_path": str(rolling_feedback_path),
+        "rolling_observations_path": str(rolling_observations_path),
         "quickstart_summary_path": str(quickstart_summary_path),
         "market_result": market_result,
         "screener_result": screener_result,
+        "rolling_result": rolling_manifest_summary(rolling_result),
         "feedback_results": feedback_results,
         "wiki_result": wiki_result,
         "dashboard_result": dashboard_result,
@@ -212,9 +256,11 @@ def run_stock_quickstart(
     return manifest
 
 
-def load_price_histories(symbols: Iterable[str], price_csv: str | Path | None = None) -> dict[str, list[PriceBar]]:
+def load_price_histories(symbols: Iterable[str], price_csv: str | Path | None = None, live: bool = False) -> dict[str, list[PriceBar]]:
     if price_csv:
         return load_price_csv(price_csv)
+    if not live:
+        raise RuntimeError("price_csv is required unless live=True")
     return {symbol: fetch_public_daily(symbol) for symbol in symbols}
 
 
@@ -262,9 +308,7 @@ def fetch_public_daily(symbol: str) -> list[PriceBar]:
 
 def fetch_yahoo_chart_daily(symbol: str) -> list[PriceBar]:
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(symbol.upper())}?range=2y&interval=1d"
-    req = urllib.request.Request(url, headers={"User-Agent": "thesis-os-public-stock-quickstart/0.1"})
-    with urllib.request.urlopen(req, timeout=20) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+    payload = json.loads(_read_url_text(url, provider="Yahoo chart"))
     result = (payload.get("chart", {}).get("result") or [None])[0]
     if not result:
         raise RuntimeError(payload.get("chart", {}).get("error") or "empty Yahoo chart response")
@@ -295,9 +339,7 @@ def fetch_yahoo_chart_daily(symbol: str) -> list[PriceBar]:
 def fetch_stooq_daily(symbol: str) -> list[PriceBar]:
     stooq_symbol = _stooq_symbol(symbol)
     url = f"https://stooq.com/q/d/l/?s={urllib.parse.quote(stooq_symbol)}&i=d"
-    req = urllib.request.Request(url, headers={"User-Agent": "thesis-os-public-stock-quickstart/0.1"})
-    with urllib.request.urlopen(req, timeout=20) as response:
-        text = response.read().decode("utf-8")
+    text = _read_url_text(url, provider="Stooq CSV")
     rows = list(csv.DictReader(text.splitlines()))
     bars: list[PriceBar] = []
     for row in rows:
@@ -326,13 +368,39 @@ def _stooq_symbol(symbol: str) -> str:
     return f"{raw}.us"
 
 
+def _read_url_text(url: str, provider: str, attempts: int = 3, timeout: int = 20) -> str:
+    headers = {
+        "User-Agent": HTTP_USER_AGENT,
+        "Accept": "text/csv,application/json,text/plain,*/*",
+        "Connection": "close",
+    }
+    errors: list[str] = []
+    for attempt in range(attempts):
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                return response.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:  # pragma: no cover - network-dependent
+            errors.append(f"HTTP {exc.code}")
+            if exc.code not in {408, 429, 500, 502, 503, 504} or attempt == attempts - 1:
+                break
+        except urllib.error.URLError as exc:  # pragma: no cover - network-dependent
+            errors.append(str(exc.reason))
+            if attempt == attempts - 1:
+                break
+        if attempt < attempts - 1:
+            time.sleep(0.75 * (2**attempt))
+    raise RuntimeError(f"{provider} request failed after {attempts} attempts: {'; '.join(errors)}")
+
+
 def _quickstart_row(
     ticker: str,
     bars: list[PriceBar],
     benchmark_metrics: dict[str, float | str],
     horizon_days: int,
+    anchor_idx: int | None = None,
 ) -> dict[str, object]:
-    metrics = _metrics_at_anchor(bars, horizon_days=horizon_days)
+    metrics = _metrics_at_index(bars, anchor_idx if anchor_idx is not None else len(bars) - 1 - horizon_days, horizon_days=horizon_days)
     close = float(metrics["close"])
     sma50 = float(metrics["sma50"])
     sma200 = float(metrics["sma200"])
@@ -414,8 +482,13 @@ def _attach_cross_sectional_scores(rows: list[dict[str, object]]) -> list[dict[s
 
 
 def _metrics_at_anchor(bars: list[PriceBar], horizon_days: int) -> dict[str, float | str]:
-    anchor_idx = max(0, len(bars) - 1 - horizon_days)
-    latest = bars[-1]
+    return _metrics_at_index(bars, max(0, len(bars) - 1 - horizon_days), horizon_days=horizon_days)
+
+
+def _metrics_at_index(bars: list[PriceBar], anchor_idx: int, horizon_days: int) -> dict[str, float | str]:
+    anchor_idx = max(0, min(anchor_idx, len(bars) - 1))
+    latest_idx = min(len(bars) - 1, anchor_idx + horizon_days)
+    latest = bars[latest_idx]
     anchor = bars[anchor_idx]
     closes = [bar.close for bar in bars[: anchor_idx + 1]]
     volumes = [bar.volume for bar in bars[: anchor_idx + 1]]
@@ -437,6 +510,78 @@ def _metrics_at_anchor(bars: list[PriceBar], horizon_days: int) -> dict[str, flo
         "volume_expansion": _volume_expansion(volumes),
         "volatility_63d": _volatility(closes, 63),
     }
+
+
+def rolling_walk_forward_summary(
+    histories: dict[str, list[PriceBar]],
+    tickers: list[str],
+    benchmark: str,
+    horizon_days: int,
+    top_n: int,
+    window_count: int,
+    step_days: int,
+) -> dict[str, object]:
+    reference = histories[benchmark]
+    anchor_indexes = _rolling_anchor_indexes(reference, horizon_days=horizon_days, window_count=window_count, step_days=step_days)
+    observations: list[dict[str, object]] = []
+    for anchor_idx in anchor_indexes:
+        benchmark_metrics = _metrics_at_index(reference, anchor_idx, horizon_days=horizon_days)
+        rows = []
+        for ticker in tickers:
+            bars = histories.get(ticker, [])
+            if len(bars) <= anchor_idx + horizon_days:
+                continue
+            rows.append(_quickstart_row(ticker, bars, benchmark_metrics, horizon_days, anchor_idx=anchor_idx))
+        rows = _attach_cross_sectional_scores(rows)
+        candidates = build_quant_candidates(rows, top_n=top_n)
+        returns_by_ticker = {str(row["ticker"]): row for row in rows}
+        for rank, candidate in enumerate(candidates, start=1):
+            row = returns_by_ticker.get(candidate.ticker)
+            if not row:
+                continue
+            absolute_return = float(row.get("forward_return") or 0.0)
+            benchmark_return = float(row.get("benchmark_forward_return") or 0.0)
+            excess_return = absolute_return - benchmark_return
+            observations.append(
+                {
+                    "as_of_date": row["as_of_date"],
+                    "evaluation_date": row["latest_date"],
+                    "ticker": candidate.ticker,
+                    "rank": rank,
+                    "score": candidate.score,
+                    "absolute_return": absolute_return,
+                    "benchmark_return": benchmark_return,
+                    "excess_return": excess_return,
+                    "hit": excess_return > 0,
+                    "signals": row.get("source_signals", ""),
+                }
+            )
+    excess_values = [float(item["excess_return"]) for item in observations]
+    hit_count = sum(1 for item in observations if item["hit"])
+    return {
+        "window_count": len(anchor_indexes),
+        "observation_count": len(observations),
+        "horizon_days": horizon_days,
+        "step_days": step_days,
+        "top_n": top_n,
+        "hit_rate": hit_count / len(observations) if observations else 0.0,
+        "average_absolute_return": _mean(float(item["absolute_return"]) for item in observations),
+        "average_benchmark_return": _mean(float(item["benchmark_return"]) for item in observations),
+        "average_excess_return": _mean(excess_values),
+        "best_excess_return": max(excess_values) if excess_values else 0.0,
+        "worst_excess_return": min(excess_values) if excess_values else 0.0,
+        "observations": observations,
+    }
+
+
+def _rolling_anchor_indexes(reference: list[PriceBar], horizon_days: int, window_count: int, step_days: int) -> list[int]:
+    latest_anchor = len(reference) - 1 - horizon_days
+    indexes: list[int] = []
+    for offset in range(max(1, window_count)):
+        idx = latest_anchor - offset * max(1, step_days)
+        if idx >= 30 and idx + horizon_days < len(reference):
+            indexes.append(idx)
+    return list(reversed(indexes))
 
 
 def _row_to_evidence(row: dict[str, object], benchmark: str) -> Evidence:
@@ -485,7 +630,7 @@ def _quickstart_thesis(candidate: dict[str, object], row: dict[str, object], ben
             "Follow-up business evidence does not support the price signal.",
         ],
         risks=[
-            "This quickstart uses public price history only.",
+            "This quickstart uses price history only.",
             "A price-only screener can find momentum but cannot prove business quality or valuation upside.",
         ],
         updated_at=utc_now(),
@@ -559,16 +704,27 @@ def _quickstart_summary_markdown(
     candidates: list[dict[str, object]],
     benchmark: str,
     horizon_days: int,
+    rolling_result: dict[str, object],
+    source_label: str,
 ) -> str:
     lines = [
-        "This quickstart uses public price history to demonstrate the Thesis OS loop.",
+        "This quickstart uses price history to demonstrate the Thesis OS loop.",
         "",
         "It is intentionally simple: public price data becomes quantitative evidence, the screener creates candidates, Lattice records a thesis and prediction, and the historical horizon is evaluated against a benchmark.",
         "",
         "## Data Boundary",
-        "- Default source: Yahoo Finance public chart endpoint; local CSV is supported for fully reproducible runs.",
+        f"- Run source: `{source_label}`.",
+        "- Default source: bundled sample CSV for fully reproducible first-run success.",
+        "- Optional live mode: pass `--live` to fetch no-key Yahoo Finance chart data with Stooq fallback.",
         "- No broker login, API key, private portfolio, Telegram, Gmail, or paid feed is required.",
         "- This is price-only evidence. Replace or enrich it with fundamentals, filings, flows, consensus, and domain evidence for real research.",
+        "",
+        "## Rolling Walk-Forward Snapshot",
+        f"- Windows: {rolling_result['window_count']}",
+        f"- Candidate observations: {rolling_result['observation_count']}",
+        f"- Hit rate: {float(rolling_result['hit_rate']):.1%}",
+        f"- Average excess return: {float(rolling_result['average_excess_return']):.2%}",
+        f"- Horizon: {horizon_days} trading days against `{benchmark}`",
         "",
         "## Candidate Outcomes",
         "| Ticker | As Of | Latest | Score | Forward Return | Benchmark | Excess | Signals |",
@@ -602,6 +758,79 @@ def _quickstart_summary_markdown(
         ]
     )
     return "\n".join(lines)
+
+
+def rolling_summary_markdown(rolling_result: dict[str, object]) -> str:
+    lines = [
+        "This report evaluates the quickstart screener over multiple historical anchor dates.",
+        "",
+        "It is a smoke-test for the feedback loop, not a claim of durable alpha. Replace the sample/live adapter with your own survivorship-safe universe before drawing investment conclusions.",
+        "",
+        "## Aggregate",
+        f"- Windows: {rolling_result['window_count']}",
+        f"- Candidate observations: {rolling_result['observation_count']}",
+        f"- Hit rate: {float(rolling_result['hit_rate']):.1%}",
+        f"- Average absolute return: {float(rolling_result['average_absolute_return']):.2%}",
+        f"- Average benchmark return: {float(rolling_result['average_benchmark_return']):.2%}",
+        f"- Average excess return: {float(rolling_result['average_excess_return']):.2%}",
+        f"- Best excess return: {float(rolling_result['best_excess_return']):.2%}",
+        f"- Worst excess return: {float(rolling_result['worst_excess_return']):.2%}",
+        "",
+        "## Observations",
+        "| As Of | Eval Date | Rank | Ticker | Score | Abs Return | Benchmark | Excess | Hit | Signals |",
+        "|---|---|---:|---|---:|---:|---:|---:|---|---|",
+    ]
+    for item in rolling_result["observations"]:
+        lines.append(
+            f"| {item['as_of_date']} | {item['evaluation_date']} | {item['rank']} | `{item['ticker']}` | "
+            f"{float(item['score']):.2f} | {float(item['absolute_return']):.2%} | "
+            f"{float(item['benchmark_return']):.2%} | {float(item['excess_return']):.2%} | "
+            f"{'yes' if item['hit'] else 'no'} | {item['signals']} |"
+        )
+    return "\n".join(lines)
+
+
+def rolling_manifest_summary(rolling_result: dict[str, object]) -> dict[str, object]:
+    return {key: value for key, value in rolling_result.items() if key != "observations"}
+
+
+def _write_default_sample_price_csv(path: Path, symbols: list[str]) -> None:
+    specs = {
+        "NVDA": (100.0, 0.0046, 2_200_000, 0.1),
+        "AAPL": (160.0, 0.0017, 1_700_000, 1.3),
+        "MSFT": (220.0, 0.0024, 1_900_000, 2.1),
+        "SPY": (430.0, 0.0014, 3_200_000, 0.7),
+        "TSM": (90.0, 0.0027, 1_300_000, 2.8),
+        "AVGO": (120.0, 0.0035, 1_100_000, 1.8),
+    }
+    rows = ["ticker,date,open,high,low,close,volume"]
+    start = date(2024, 1, 2)
+    for symbol in symbols:
+        base, drift, base_volume, phase = specs.get(symbol, (100.0, 0.0018, 1_000_000, 0.0))
+        current = start
+        trading_idx = 0
+        while trading_idx < 220:
+            if current.weekday() < 5:
+                cycle = 1.0 + 0.025 * math.sin(trading_idx / 13.0 + phase)
+                close = base * ((1.0 + drift) ** trading_idx) * cycle
+                daily_range = 0.012 + 0.004 * abs(math.sin(trading_idx / 9.0 + phase))
+                volume = base_volume * (1.0 + 0.0015 * trading_idx) * (1.0 + 0.08 * abs(math.sin(trading_idx / 11.0 + phase)))
+                rows.append(
+                    ",".join(
+                        [
+                            symbol,
+                            current.isoformat(),
+                            f"{close * (1.0 - daily_range / 3):.4f}",
+                            f"{close * (1.0 + daily_range):.4f}",
+                            f"{close * (1.0 - daily_range):.4f}",
+                            f"{close:.4f}",
+                            f"{volume:.0f}",
+                        ]
+                    )
+                )
+                trading_idx += 1
+            current += timedelta(days=1)
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
 
 
 def _sma(values: list[float], window: int) -> float:
@@ -649,6 +878,11 @@ def _clamp01(value: float) -> float:
     if math.isnan(value) or math.isinf(value):
         return 0.0
     return max(0.0, min(1.0, value))
+
+
+def _mean(values: Iterable[float]) -> float:
+    items = list(values)
+    return sum(items) / len(items) if items else 0.0
 
 
 def _num(value: object, default: float = 0.0) -> float:
