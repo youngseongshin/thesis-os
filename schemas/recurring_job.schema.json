@@ -6,7 +6,7 @@
   "required": ["id", "owner_agent", "cadence", "command", "outputs"],
   "properties": {
     "id": {"type": "string"},
-    "owner_agent": {"type": "string", "enum": ["alpha", "gyeokja", "arki"]},
+    "owner_agent": {"type": "string", "enum": ["alpha", "lattice", "arki"]},
     "cadence": {"type": "string"},
     "command": {"type": "string"},
     "outputs": {"type": "array", "items": {"type": "string"}},
@@ -16,4 +16,3 @@
   },
   "additionalProperties": true
 }
-

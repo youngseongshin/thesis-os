@@ -15,8 +15,8 @@ skills:
     forbidden_actions:
       - "make final portfolio decision"
 
-  - id: gyeokja-devil-advocate
-    agent: gyeokja
+  - id: lattice-devil-advocate
+    agent: lattice
     purpose: "Challenge high-importance theses before action."
     inputs:
       - "thesis"
@@ -43,4 +43,3 @@ skills:
       - "fail CI"
     forbidden_actions:
       - "change investment thesis"
-

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from thesis_os.gyeokja.devil_advocate import devil_advocate_check
+from thesis_os.lattice.devil_advocate import devil_advocate_check
 from thesis_os.models import Action, Thesis
 
 

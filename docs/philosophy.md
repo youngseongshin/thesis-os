@@ -26,7 +26,7 @@ Research is incomplete until the system checks what happened. The feedback loop 
 
 ### 5. Agents Need Clear Boundaries
 
-Alpha collects evidence. Gyeokja makes investment judgments. Arki maintains the operating system. Each agent has a role, skill scope, and output contract.
+Alpha collects evidence. Lattice makes investment judgments. Arki maintains the operating system. Each agent has a role, skill scope, and output contract.
 
 ### 6. Private Data Stays Private
 
@@ -39,4 +39,3 @@ Open-source code should expose methods, schemas, and examples, not real accounts
 - Not financial advice
 - Not a replacement for licensed professionals
 - Not a place to store secrets
-

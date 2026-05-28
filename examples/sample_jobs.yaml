@@ -11,8 +11,8 @@ jobs:
     failure_policy: "log and alert"
     enabled: true
 
-  - id: gyeokja-prediction-feedback
-    owner_agent: gyeokja
+  - id: lattice-prediction-feedback
+    owner_agent: lattice
     cadence: "weekday 19:00 local"
     command: "thesis-os demo --out ./demo_run"
     outputs:
@@ -31,4 +31,3 @@ jobs:
     freshness_sla: "1 day"
     failure_policy: "block release until fixed"
     enabled: true
-

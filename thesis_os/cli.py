@@ -5,18 +5,21 @@ import csv
 import json
 from pathlib import Path
 
+from thesis_os.adapters.sample import SampleQualitativeProvider, SampleQuantProvider
 from thesis_os.alpha.collectors import load_evidence_csv
+from thesis_os.alpha.evidence_builder import event_to_evidence, ingest_csv_to_workspace, ingest_evidence_to_workspace
 from thesis_os.alpha.local_db import connect, init_db, insert_evidence, list_evidence
-from thesis_os.arki.health_check import check_demo_outputs
+from thesis_os.arki.health_check import check_demo_outputs, check_workspace
 from thesis_os.arki.job_manifest import write_default_job_manifest
 from thesis_os.arki.schema_lint import lint_schemas
 from thesis_os.arki.vault_writer import VaultWriter
-from thesis_os.gyeokja.action_queue import write_action_queue
-from thesis_os.gyeokja.decision_card import decision_card_markdown
-from thesis_os.gyeokja.feedback_interpreter import feedback_report_markdown
-from thesis_os.gyeokja.prediction_ledger import append_prediction, read_predictions
-from thesis_os.gyeokja.thesis_registry import build_sample_thesis, thesis_markdown
+from thesis_os.lattice.action_queue import write_action_queue
+from thesis_os.lattice.decision_card import decision_card_markdown
+from thesis_os.lattice.feedback_interpreter import feedback_report_markdown
+from thesis_os.lattice.prediction_ledger import append_prediction, read_predictions
+from thesis_os.lattice.thesis_registry import build_sample_thesis, thesis_markdown
 from thesis_os.models import Action, Prediction, utc_now
+from thesis_os.runtime.workspace import init_workspace, load_workspace_evidence
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -32,6 +35,45 @@ def main(argv: list[str] | None = None) -> int:
     lint_parser = sub.add_parser("lint", help="Lint public schemas.")
     lint_parser.add_argument("--root", default=".", help="Repository root.")
 
+    alpha_parser = sub.add_parser("alpha", help="Alpha evidence collection commands.")
+    alpha_sub = alpha_parser.add_subparsers(dest="alpha_command", required=True)
+    alpha_ingest = alpha_sub.add_parser("ingest-csv", help="Ingest evidence CSV into a workspace.")
+    alpha_ingest.add_argument("--csv", required=True, help="Evidence CSV path.")
+    alpha_ingest.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    alpha_sample = alpha_sub.add_parser("sample-collect", help="Run public sample quant and qualitative providers.")
+    alpha_sample.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    alpha_list = alpha_sub.add_parser("list-evidence", help="List workspace evidence records.")
+    alpha_list.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+
+    lattice_parser = sub.add_parser("lattice", help="Lattice judgment commands. Korean: 격자.")
+    lattice_sub = lattice_parser.add_subparsers(dest="lattice_command", required=True)
+    lattice_thesis = lattice_sub.add_parser("build-thesis", help="Build a sample thesis from workspace evidence.")
+    lattice_thesis.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    lattice_thesis.add_argument("--entity", default="", help="Optional entity filter.")
+    lattice_decision = lattice_sub.add_parser("decision-card", help="Create a decision card from workspace evidence.")
+    lattice_decision.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    lattice_decision.add_argument("--action", default="watch", help="Action enum value.")
+    lattice_decision.add_argument("--reason", default="Evidence supports monitoring, but market reflection and base-rate checks remain required.")
+    lattice_predict = lattice_sub.add_parser("predict", help="Append a prediction to the workspace ledger.")
+    lattice_predict.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    lattice_predict.add_argument("--prediction", required=True, help="Prediction statement.")
+    lattice_predict.add_argument("--direction", default="relative_outperform")
+    lattice_predict.add_argument("--horizon", default="1m")
+    lattice_predict.add_argument("--confidence", type=float, default=0.55)
+    lattice_predict.add_argument("--evaluation-due", default="manual")
+    lattice_eval = lattice_sub.add_parser("evaluate", help="Evaluate a prediction with measured returns.")
+    lattice_eval.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    lattice_eval.add_argument("--prediction-id", required=True)
+    lattice_eval.add_argument("--absolute-return", required=True, type=float, help="Example: 0.04 for 4%.")
+    lattice_eval.add_argument("--benchmark-return", default=0.0, type=float)
+
+    arki_parser = sub.add_parser("arki", help="Arki system governance commands.")
+    arki_sub = arki_parser.add_subparsers(dest="arki_command", required=True)
+    arki_init = arki_sub.add_parser("init", help="Initialize a Thesis OS workspace.")
+    arki_init.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+    arki_health = arki_sub.add_parser("health", help="Check workspace health.")
+    arki_health.add_argument("--workspace", default="./thesis_os_workspace", help="Workspace directory.")
+
     args = parser.parse_args(argv)
     if args.command == "demo":
         return run_demo(Path(args.out))
@@ -39,14 +81,18 @@ def main(argv: list[str] | None = None) -> int:
         return run_init(Path(args.out))
     if args.command == "lint":
         return run_lint(Path(args.root))
+    if args.command == "alpha":
+        return run_alpha(args)
+    if args.command == "lattice":
+        return run_lattice(args)
+    if args.command == "arki":
+        return run_arki(args)
     parser.error("unknown command")
     return 2
 
 
 def run_init(out: Path) -> int:
-    vault = VaultWriter(out / "vault")
-    vault.ensure_layout()
-    write_default_job_manifest(out / "jobs.yaml")
+    init_workspace(out)
     print(f"initialized Thesis OS workspace: {out}")
     return 0
 
@@ -59,6 +105,137 @@ def run_lint(root: Path) -> int:
         return 1
     print("schema lint ok")
     return 0
+
+
+def run_alpha(args: argparse.Namespace) -> int:
+    workspace = Path(args.workspace)
+    init_workspace(workspace)
+    if args.alpha_command == "ingest-csv":
+        result = ingest_csv_to_workspace(args.csv, workspace)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+    if args.alpha_command == "sample-collect":
+        quant = SampleQuantProvider().collect()
+        qualitative_events = SampleQualitativeProvider().collect_events()
+        qualitative = [event_to_evidence(event) for event in qualitative_events]
+        result = ingest_evidence_to_workspace(workspace, quant + qualitative)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return 0
+    if args.alpha_command == "list-evidence":
+        evidence = load_workspace_evidence(workspace)
+        print(json.dumps([item.to_dict() for item in evidence], indent=2, ensure_ascii=False))
+        return 0
+    raise ValueError(f"unknown alpha command: {args.alpha_command}")
+
+
+def run_lattice(args: argparse.Namespace) -> int:
+    workspace = Path(args.workspace)
+    init_workspace(workspace)
+    evidence = load_workspace_evidence(workspace)
+    if args.lattice_command in {"build-thesis", "decision-card", "predict"}:
+        if args.lattice_command == "build-thesis" and args.entity:
+            evidence = [item for item in evidence if item.entity == args.entity]
+        if not evidence:
+            print("ERROR: no evidence available. Run `thesis-os alpha sample-collect` or ingest CSV first.")
+            return 1
+
+    if args.lattice_command == "build-thesis":
+        thesis = build_sample_thesis(evidence)
+        path = _write_thesis(workspace, thesis)
+        print(json.dumps({"thesis_id": thesis.id, "path": str(path)}, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.lattice_command == "decision-card":
+        thesis = build_sample_thesis(evidence)
+        _write_thesis(workspace, thesis)
+        action = Action(
+            id="ACTION-SAMPLE-001",
+            entity=thesis.entity,
+            action=args.action,
+            reason=args.reason,
+            evidence_ids=thesis.evidence_ids,
+            created_at=utc_now(),
+            thesis_id=thesis.id,
+            confidence="medium",
+            next_check="Next scheduled review",
+        )
+        path = _write_decision(workspace, thesis, action)
+        write_action_queue(workspace / "action_queue.json", [action])
+        print(json.dumps({"action_id": action.id, "path": str(path)}, indent=2, ensure_ascii=False))
+        return 0
+
+    if args.lattice_command == "predict":
+        thesis = build_sample_thesis(evidence)
+        _write_thesis(workspace, thesis)
+        prediction = Prediction(
+            id=f"PRED-{utc_now().replace(':', '').replace('-', '')}",
+            entity=thesis.entity,
+            thesis_id=thesis.id,
+            prediction=args.prediction,
+            direction=args.direction,
+            horizon=args.horizon,
+            confidence=args.confidence,
+            created_at=utc_now(),
+            evaluation_due=args.evaluation_due,
+            evidence_ids=thesis.evidence_ids,
+            invalidation=thesis.invalidation,
+        )
+        append_prediction(workspace / "prediction_ledger.jsonl", prediction)
+        print(json.dumps(prediction.to_dict(), indent=2, ensure_ascii=False))
+        return 0
+
+    if args.lattice_command == "evaluate":
+        predictions = read_predictions(workspace / "prediction_ledger.jsonl")
+        prediction = next((item for item in predictions if item.get("id") == args.prediction_id), None)
+        if prediction is None:
+            print(f"ERROR: prediction not found: {args.prediction_id}")
+            return 1
+        feedback_md = feedback_report_markdown(prediction, args.absolute_return, args.benchmark_return)
+        path = VaultWriter(workspace / "vault").write_note(
+            f"feedback/{args.prediction_id}_feedback.md",
+            title=f"Feedback: {args.prediction_id}",
+            body=feedback_md,
+            frontmatter={
+                "prediction_id": args.prediction_id,
+                "entity": prediction.get("entity", ""),
+                "generated_at": utc_now(),
+            },
+        )
+        print(json.dumps({"prediction_id": args.prediction_id, "path": str(path)}, indent=2, ensure_ascii=False))
+        return 0
+
+    raise ValueError(f"unknown lattice command: {args.lattice_command}")
+
+
+def run_arki(args: argparse.Namespace) -> int:
+    workspace = Path(args.workspace)
+    if args.arki_command == "init":
+        init_workspace(workspace)
+        print(json.dumps({"workspace": str(workspace), "initialized": True}, indent=2))
+        return 0
+    if args.arki_command == "health":
+        health = check_workspace(workspace)
+        print(json.dumps({"workspace": str(workspace), "health": health}, indent=2, ensure_ascii=False))
+        return 0 if health["ok"] else 1
+    raise ValueError(f"unknown arki command: {args.arki_command}")
+
+
+def _write_thesis(workspace: Path, thesis) -> Path:
+    return VaultWriter(workspace / "vault").write_note(
+        f"theses/{thesis.id}.md",
+        title="Sample AI Infrastructure Thesis",
+        body=thesis_markdown(thesis),
+        frontmatter=thesis.to_dict(),
+    )
+
+
+def _write_decision(workspace: Path, thesis, action: Action) -> Path:
+    return VaultWriter(workspace / "vault").write_note(
+        f"decisions/{action.id}.md",
+        title="Sample Decision Card",
+        body=decision_card_markdown(thesis, action),
+        frontmatter=action.to_dict(),
+    )
 
 
 def run_demo(out: Path) -> int:
@@ -93,12 +270,7 @@ def run_demo(out: Path) -> int:
         )
 
     thesis = build_sample_thesis(evidence)
-    vault.write_note(
-        "theses/THESIS-SAMPLE-AI-INFRA-001.md",
-        title="Sample AI Infrastructure Thesis",
-        body=thesis_markdown(thesis),
-        frontmatter=thesis.to_dict(),
-    )
+    _write_thesis(out, thesis)
 
     action = Action(
         id="ACTION-SAMPLE-001",
@@ -111,12 +283,7 @@ def run_demo(out: Path) -> int:
         confidence="medium",
         next_check="Next weekly refresh",
     )
-    vault.write_note(
-        "decisions/ACTION-SAMPLE-001.md",
-        title="Sample Decision Card",
-        body=decision_card_markdown(thesis, action),
-        frontmatter=action.to_dict(),
-    )
+    _write_decision(out, thesis, action)
     write_action_queue(out / "action_queue.json", [action])
 
     prediction = Prediction(
@@ -197,4 +364,3 @@ def _write_sample_evidence_csv(path: Path) -> None:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

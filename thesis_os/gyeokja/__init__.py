@@ -1,2 +1,0 @@
-"""Gyeokja judgment layer."""
-

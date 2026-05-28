@@ -16,8 +16,8 @@ jobs:
     failure_policy: "log and alert"
     enabled: true
 
-  - id: gyeokja-prediction-feedback
-    owner_agent: gyeokja
+  - id: lattice-prediction-feedback
+    owner_agent: lattice
     cadence: "weekday 19:00 local"
     command: "thesis-os demo --out ./demo_run"
     outputs:
@@ -44,4 +44,3 @@ def write_default_job_manifest(path: str | Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(DEFAULT_JOBS_YAML, encoding="utf-8")
     return path
-

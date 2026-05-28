@@ -15,4 +15,10 @@ jobs:
       - run: python -m pip install -e .
       - run: python -m thesis_os lint --root .
       - run: python -m thesis_os demo --out /tmp/thesis-os-demo
+      - run: python -m thesis_os arki init --workspace /tmp/thesis-os-workspace
+      - run: python -m thesis_os alpha sample-collect --workspace /tmp/thesis-os-workspace
+      - run: python -m thesis_os lattice build-thesis --workspace /tmp/thesis-os-workspace
+      - run: python -m thesis_os lattice decision-card --workspace /tmp/thesis-os-workspace
+      - run: python -m thesis_os lattice predict --workspace /tmp/thesis-os-workspace --prediction "Sample prediction" --direction relative_outperform --horizon 1m
+      - run: python -m thesis_os arki health --workspace /tmp/thesis-os-workspace
       - run: python -m unittest discover -s tests

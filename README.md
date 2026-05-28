@@ -1,5 +1,10 @@
 # Thesis OS
 
+[![CI](https://github.com/youngseongshin/thesis-os/actions/workflows/ci.yml/badge.svg)](https://github.com/youngseongshin/thesis-os/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+[한국어 README](README.ko.md)
+
 Thesis OS is a three-agent, thesis-driven investment research operating system.
 
 It combines quantitative market data, qualitative intelligence channels, local databases, long-term vault memory, agent skills, recurring research jobs, thesis registries, prediction ledgers, and feedback loops.
@@ -10,13 +15,20 @@ The goal is not to build an autonomous trading bot. The goal is to make investme
 
 Investment work is often scattered across charts, filings, chats, notes, videos, news, spreadsheets, and memory. Thesis OS turns those fragments into a structured loop:
 
-```text
-Data sources
-  -> Alpha: collect and verify evidence
-  -> Gyeokja: convert evidence into theses, actions, and predictions
-  -> Arki: maintain schemas, vault policy, recurring jobs, and system health
-  -> Feedback loop: evaluate outcomes and improve future judgment
+```mermaid
+flowchart LR
+  Sources["Quant + Qual Sources"] --> Alpha["Alpha<br/>Evidence Collection"]
+  Alpha --> Memory["Local DB + Vault"]
+  Memory --> Lattice["Lattice<br/>Thesis + Judgment"]
+  Lattice --> Ledger["Action Queue<br/>Prediction Ledger"]
+  Ledger --> Feedback["Feedback Loop<br/>Returns + Failure Modes"]
+  Feedback --> Lattice
+  Arki["Arki<br/>Schemas + Jobs + Health"] -. governs .-> Alpha
+  Arki -. governs .-> Lattice
+  Arki -. governs .-> Memory
 ```
+
+The loop is deliberately explicit: collect evidence, write memory, form a thesis, register a prediction, evaluate the outcome, and improve the next judgment.
 
 ## Three Agents
 
@@ -28,9 +40,11 @@ Alpha collects, normalizes, and verifies quantitative and qualitative inputs.
 - Qualitative data: news, filings, transcripts, Telegram, Facebook, YouTube, newsletters, community signals
 - Output: evidence records, local DB snapshots, screener candidates, research packets
 
-### Gyeokja: Judgment
+### Lattice: Judgment
 
-Gyeokja turns evidence into investment judgment.
+Lattice turns evidence into investment judgment.
+
+The name comes from Charlie Munger's idea of a "latticework of mental models." The agent is not meant to rely on one lens. It should combine evidence, incentives, base rates, market structure, valuation, risk, and counterarguments into a more disciplined investment judgment. In Korean materials, this role can be called **격자**.
 
 - Thesis registry
 - Decision cards
@@ -77,7 +91,7 @@ Excluded:
 Requires Python 3.10+.
 
 ```bash
-git clone https://github.com/YOUR_ORG/thesis-os.git
+git clone https://github.com/youngseongshin/thesis-os.git
 cd thesis-os
 python3 -m venv .venv
 . .venv/bin/activate
@@ -99,6 +113,24 @@ You can also run without installing:
 ```bash
 python -m thesis_os demo --out ./demo_run
 python -m thesis_os lint --root .
+```
+
+Agent-specific commands:
+
+```bash
+python -m thesis_os arki init --workspace ./workspace
+python -m thesis_os alpha sample-collect --workspace ./workspace
+python -m thesis_os alpha list-evidence --workspace ./workspace
+python -m thesis_os lattice build-thesis --workspace ./workspace
+python -m thesis_os lattice decision-card --workspace ./workspace
+python -m thesis_os lattice predict --workspace ./workspace \
+  --prediction "The basket should outperform if evidence remains positive." \
+  --direction relative_outperform \
+  --horizon 1m
+python -m thesis_os lattice evaluate --workspace ./workspace \
+  --prediction-id PRED_ID \
+  --absolute-return 0.04 \
+  --benchmark-return 0.015
 ```
 
 ## Public / Private Boundary
@@ -128,3 +160,10 @@ This is an early public scaffold. The current implementation focuses on the mini
 
 The next milestones are connector interfaces, richer feedback metrics, and reproducible job scheduling.
 
+## Community
+
+If this project is useful, please star it and open issues with concrete agent ownership:
+
+- Alpha for evidence collection
+- Lattice for judgment
+- Arki for system governance

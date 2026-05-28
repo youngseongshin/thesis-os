@@ -6,7 +6,7 @@ Thesis OS is organized as a loop.
 Quant + qualitative sources
   -> Alpha evidence collection
   -> Local DB + vault memory
-  -> Gyeokja thesis and judgment
+  -> Lattice thesis and judgment
   -> Prediction ledger and action queue
   -> Feedback evaluator
   -> Arki system maintenance
@@ -41,9 +41,9 @@ Output examples:
 - `research_packet.json`
 - `screener_candidates.json`
 
-### Gyeokja Layer
+### Lattice Layer
 
-Gyeokja turns evidence into investment objects.
+Lattice turns evidence into investment objects.
 
 Output examples:
 
@@ -73,4 +73,3 @@ Output examples:
 - `feedback/{date}_feedback.md`
 - `feedback_metrics.json`
 - updated thesis status
-
