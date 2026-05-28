@@ -5,14 +5,29 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "thesis-os"
 version = "0.5.0"
-description = "A three-agent, thesis-driven investment research operating system."
+description = "A thesis-driven investment research OS for stock screeners, trading journals, portfolio feedback loops, and AI agents."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
   {name = "Thesis OS Contributors"}
 ]
-keywords = ["investment", "research", "agents", "thesis", "evidence", "feedback-loop"]
+keywords = [
+  "investment",
+  "investment-research",
+  "stock-research",
+  "stock-screener",
+  "trading",
+  "trading-journal",
+  "portfolio-management",
+  "equity-research",
+  "quantitative-finance",
+  "ai-agents",
+  "research-os",
+  "thesis",
+  "evidence",
+  "feedback-loop",
+]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Financial and Insurance Industry",

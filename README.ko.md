@@ -8,7 +8,11 @@ Thesis OS는 **근거 우선, 테시스 기반 투자 리서치 OS**입니다.
 
 정량 데이터, 정성 인텔리전스, 로컬 데이터베이스, 마크다운 vault, 에이전트 워크플로우, 예측 원장, 피드백 루프를 하나의 감사 가능한 판단 기계로 묶습니다.
 
+이 프로젝트는 **investment research, stock research, stock screener, trading journal, portfolio management, equity research, quantitative finance, AI agents** 같은 주제를 다루는 투자자와 빌더를 위한 프레임워크입니다.
+
 목표는 자동매매 봇이나 AI 종목 추천기를 만드는 것이 아닙니다. 목표는 투자 판단을 더 명시적이고, 검증 가능하며, 시간이 지날수록 개선 가능한 형태로 만드는 것입니다.
+
+**검색 키워드:** investment research, stock research, stock screener, trading journal, portfolio management, equity research, quantitative finance, AI agents, local-first research OS.
 
 ## 지금 바로 확인할 수 있는 것
 

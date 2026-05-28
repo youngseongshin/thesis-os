@@ -9,7 +9,11 @@
 
 **Thesis OS is an evidence-first, thesis-driven investment research operating system.** It combines quantitative data, qualitative intelligence, local databases, vault memory, agent workflows, prediction ledgers, and feedback loops into one auditable judgment machine.
 
+It is built for investors and builders working on **stock research, stock screeners, equity research, portfolio management, trading journals, investment agents, and AI-assisted research workflows**.
+
 It is not an autonomous trading bot or an AI stock picker. It is a framework for making investment judgment explicit, testable, and improvable.
+
+**Search keywords:** investment research, stock research, stock screener, trading journal, portfolio management, equity research, quantitative finance, AI agents, local-first research OS.
 
 ## What You Can Try Today
 
