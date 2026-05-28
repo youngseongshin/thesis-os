@@ -10,6 +10,17 @@ Thesis OS는 **근거 우선, 테시스 기반 투자 리서치 OS**입니다.
 
 목표는 자동매매 봇이나 AI 종목 추천기를 만드는 것이 아닙니다. 목표는 투자 판단을 더 명시적이고, 검증 가능하며, 시간이 지날수록 개선 가능한 형태로 만드는 것입니다.
 
+## 지금 바로 확인할 수 있는 것
+
+공개 데모는 증권사 계정, 사적 텔레그램, 유료 피드 없이 실행됩니다.
+
+| 목표 | 시작 지점 | 결과 |
+|---|---|---|
+| 전체 테시스 루프 실행 | `thesis-os demo --out ./demo_run` | local DB, vault note, thesis card, decision card, prediction ledger, feedback note, dashboard 생성 |
+| 콕핏 확인 | `open ./demo_run/vault/dashboard/index.html` | thesis, watchlist, action, prediction, feedback을 한 화면에서 확인 |
+| 실제 산출물 구조 보기 | [`examples/sample_outputs/`](examples/sample_outputs/) | 공개 안전 테시스 카드, Top 5 딥다이브, 집중전략, 스크리너 결과, 스크리너 피드백, 소셜 수집 예시 |
+| 시스템 확장 | [`examples/sample_jobs.yaml`](examples/sample_jobs.yaml), [`examples/sample_agent_skills.yaml`](examples/sample_agent_skills.yaml) | 반복작업과 스킬을 감사 가능한 contract로 정의 |
+
 ## 무엇이 다른가?
 
 | 일반적인 투자 리서치 흐름 | Thesis OS |
@@ -32,7 +43,11 @@ python -m pip install -e .
 thesis-os demo --out ./demo_run
 ```
 
-데모는 local SQLite DB, markdown vault, thesis card, decision card, prediction ledger, screener output, feedback note, harness validation, trade proxy evidence, static dashboard를 생성합니다. 대시보드는 `demo_run/vault/dashboard/index.html`에서 확인할 수 있습니다.
+데모는 local SQLite DB, markdown vault, thesis card, decision card, prediction ledger, screener output, feedback note, 자동화 검증 결과, 샘플 adapter evidence, static dashboard를 생성합니다. 대시보드는 `demo_run/vault/dashboard/index.html`에서 확인할 수 있습니다.
+
+<p align="center">
+  <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
+</p>
 
 <p align="center">
   <img src="docs/assets/thesis-os-architecture.svg" alt="Thesis OS architecture" width="100%">
@@ -57,7 +72,7 @@ flowchart LR
 
 ## 왜 Thesis OS인가?
 
-제가 느끼는 핵심 가치는 단순히 데이터를 모으거나 노트를 저장하는 데 있지 않습니다.
+핵심 가치는 단순히 데이터를 모으거나 노트를 저장하는 데 있지 않습니다.
 
 중요한 것은 **테시스 카드가 계속 살아 있어야 한다는 점**입니다.
 
@@ -149,7 +164,7 @@ Arki는 Thesis OS의 구조와 운영을 관리합니다.
 - migration log
 - agent skill governance
 
-## 빠른 시작
+## 명령어 레퍼런스
 
 Python 3.10+이 필요합니다.
 
@@ -249,12 +264,14 @@ python -m thesis_os arki build-dashboard --workspace ./workspace
 
 공개 repo에는 Thesis OS의 구조를 이해할 수 있는 공개 안전 샘플 산출물이 포함되어 있습니다.
 
-- [테시스 카드](examples/sample_outputs/thesis-card-ai-infrastructure-basket.md)
-- [나이트 Top 5 딥다이브](examples/sample_outputs/nightly-top5-deep-dive.md)
-- [나이트 집중전략 리뷰](examples/sample_outputs/nightly-concentration-strategy.md)
-- [스크리너 종목 발굴 결과](examples/sample_outputs/screener-discovery-results.md)
-- [스크리너 성과 피드백](examples/sample_outputs/screener-performance-feedback.md)
-- [소셜 수집 요약](examples/sample_outputs/social-collection-summary.md)
+| 산출물 | 보여주는 것 |
+|---|---|
+| [테시스 카드](examples/sample_outputs/thesis-card-ai-infrastructure-basket.md) | evidence, assumption, invalidation, action hook이 한 카드에 연결되는 방식 |
+| [나이트 Top 5 딥다이브](examples/sample_outputs/nightly-top5-deep-dive.md) | 매일 발굴된 후보가 포트폴리오 심사 전 Top 5로 압축되는 방식 |
+| [나이트 집중전략 리뷰](examples/sample_outputs/nightly-concentration-strategy.md) | 격자가 후보를 집중, 유지, 감액, 관찰 판단으로 바꾸는 방식 |
+| [스크리너 종목 발굴 결과](examples/sample_outputs/screener-discovery-results.md) | 정량 스크리너가 설명 가능한 후보 큐를 만드는 방식 |
+| [스크리너 성과 피드백](examples/sample_outputs/screener-performance-feedback.md) | forward return으로 스크리너 신호가 실제로 유효했는지 평가하는 방식 |
+| [소셜 수집 요약](examples/sample_outputs/social-collection-summary.md) | 사적 raw feed를 공개하지 않고 정성 채널을 요약하는 방식 |
 
 이 샘플들은 모두 합성 예시입니다. 실제 포트폴리오, 실제 보유 비중, 사적 채널 원문, 계좌 정보, 유료 데이터 raw를 포함하지 않습니다. 자세한 공개 경계는 [Sample Output Pack](docs/sample-output-pack.md)을 참고하세요.
 

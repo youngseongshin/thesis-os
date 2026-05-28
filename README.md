@@ -11,6 +11,17 @@
 
 It is not an autonomous trading bot or an AI stock picker. It is a framework for making investment judgment explicit, testable, and improvable.
 
+## What You Can Try Today
+
+No broker credentials, private chats, or paid feeds are required for the public demo.
+
+| Goal | Start Here | Result |
+|---|---|---|
+| Run the full thesis loop | `thesis-os demo --out ./demo_run` | Local DB, vault notes, thesis card, decision card, prediction ledger, feedback notes, and dashboard |
+| See the cockpit | `open ./demo_run/vault/dashboard/index.html` | A static review surface for theses, watchlists, actions, predictions, and feedback |
+| Inspect realistic outputs | [`examples/sample_outputs/`](examples/sample_outputs/) | Public-safe thesis card, Top 5 deep dive, concentration strategy, screener results, screener feedback, and social collection |
+| Extend the system | [`examples/sample_jobs.yaml`](examples/sample_jobs.yaml), [`examples/sample_agent_skills.yaml`](examples/sample_agent_skills.yaml) | Recurring job and skill contracts that keep automation auditable |
+
 ## Why It Is Different
 
 | Common investment workflow | Thesis OS |
@@ -33,7 +44,11 @@ python -m pip install -e .
 thesis-os demo --out ./demo_run
 ```
 
-The demo creates a local SQLite DB, markdown vault, thesis card, decision card, prediction ledger, screener outputs, feedback notes, harness validation, trade proxy evidence, and a static dashboard at `demo_run/vault/dashboard/index.html`.
+The demo creates a local SQLite DB, markdown vault, thesis card, decision card, prediction ledger, screener outputs, feedback notes, governance checks, sample adapter evidence, and a static dashboard at `demo_run/vault/dashboard/index.html`.
+
+<p align="center">
+  <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
+</p>
 
 <p align="center">
   <img src="docs/assets/thesis-os-architecture.svg" alt="Thesis OS architecture" width="100%">
@@ -193,12 +208,14 @@ Excluded:
 
 The repository includes sanitized examples of the outputs a Thesis OS deployment can produce:
 
-- [Thesis card](examples/sample_outputs/thesis-card-ai-infrastructure-basket.md)
-- [Nightly Top 5 deep dive](examples/sample_outputs/nightly-top5-deep-dive.md)
-- [Nightly concentrated strategy](examples/sample_outputs/nightly-concentration-strategy.md)
-- [Screener discovery results](examples/sample_outputs/screener-discovery-results.md)
-- [Screener performance feedback](examples/sample_outputs/screener-performance-feedback.md)
-- [Social collection summary](examples/sample_outputs/social-collection-summary.md)
+| Output | What It Demonstrates |
+|---|---|
+| [Thesis card](examples/sample_outputs/thesis-card-ai-infrastructure-basket.md) | How evidence, assumptions, invalidation, and action hooks live in one card |
+| [Nightly Top 5 deep dive](examples/sample_outputs/nightly-top5-deep-dive.md) | How daily discovery compresses candidates before portfolio review |
+| [Nightly concentrated strategy](examples/sample_outputs/nightly-concentration-strategy.md) | How Lattice turns candidates into concentration, hold, trim, or watch judgments |
+| [Screener discovery results](examples/sample_outputs/screener-discovery-results.md) | How quantitative screeners create explainable candidate queues |
+| [Screener performance feedback](examples/sample_outputs/screener-performance-feedback.md) | How forward returns grade whether a screener signal actually worked |
+| [Social collection summary](examples/sample_outputs/social-collection-summary.md) | How qualitative channels can be summarized without storing private raw feeds |
 
 These examples are synthetic and public-safe. They demonstrate structure, not investment advice or real portfolio data. See [Sample Output Pack](docs/sample-output-pack.md) for the boundary rules.
 
@@ -263,7 +280,7 @@ Thesis OS is composed of reusable skills with explicit owners and boundaries.
 
 The public skill catalog includes social collection, Facebook collection, YouTube scout, real-time market monitoring, quantitative screening, Top 5 deep dives, semiconductor specialist analysis, Deep Alpha, devil's advocate, roundtable judgment, and feedback evaluation.
 
-## Quickstart
+## Command Reference
 
 Requires Python 3.10+.
 
