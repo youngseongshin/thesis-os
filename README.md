@@ -2,16 +2,34 @@
 
 [![CI](https://github.com/youngseongshin/thesis-investment-os/actions/workflows/ci.yml/badge.svg)](https://github.com/youngseongshin/thesis-investment-os/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 [한국어 README](README.ko.md)
 
 > Build investment research agents that do not just summarize markets. They maintain theses, make decisions, register predictions, and grade themselves later.
 
-**Thesis OS is an evidence-first, thesis-driven investment research operating system.** It combines quantitative data, qualitative intelligence, local databases, vault memory, agent-ready workflows, prediction ledgers, and feedback loops into one auditable judgment loop.
+**Thesis OS is an evidence-first, thesis-driven investment research operating system.** It is a runnable open-source core that turns fragmented market information into theses, decisions, predictions, and feedback loops you can audit later.
 
-It is built for investors and builders working on **stock research, stock screeners, equity research, portfolio management, trading journals, investment agents, and AI-assisted research workflows**.
+It is for investors and builders who want their stock research, screeners, and trading-journal decisions to leave an auditable trail — not just another wall of signals.
 
-It is not an autonomous trading bot, a signal seller, or an AI stock picker. It is a framework for making investment judgment explicit, testable, and improvable.
+It is **not** an autonomous trading bot, a signal seller, or an AI stock picker, and it does not promise alpha. It is a framework for making investment judgment explicit, testable, and honest about its own track record.
+
+## Quickstart
+
+```bash
+git clone https://github.com/youngseongshin/thesis-investment-os.git
+cd thesis-investment-os
+python3 -m venv .venv && . .venv/bin/activate
+python -m pip install -e .
+thesis-os quickstart-stock --out ./quickstart_run
+```
+
+No API keys, broker logins, or paid feeds required. The run uses a bundled sample CSV — so it works fully offline — then builds a local SQLite DB, a markdown vault, quant screener candidates, a thesis card, a prediction, rolling forward-return feedback, and a static dashboard at `quickstart_run/vault/dashboard/index.html`. Add `--live --tickers NVDA,AAPL,MSFT --benchmark SPY` for no-key Yahoo/Stooq data.
+
+<p align="center">
+  <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
+</p>
 
 ## What This Project Is
 
@@ -99,18 +117,9 @@ Thesis OS does not need to own the data layer. There are already many excellent 
 
 The default quickstart uses a bundled sample price CSV so the first run succeeds even when public endpoints rate-limit shared IPs. Use `--live` to fetch no-key Yahoo Finance chart data with Stooq fallback. Serious users can replace that adapter with OpenBB, FinanceDataReader, pykrx, EDGAR/DART, broker exports, licensed datasets, or their own research database. Always check license, delay, redistribution, corporate-action adjustment, and survivorship-bias rules before production use. See [Public Data Sources](docs/public-data-sources.md).
 
-## Run It In 60 Seconds
+## What The Quickstart Produces
 
-```bash
-git clone https://github.com/youngseongshin/thesis-investment-os.git
-cd thesis-investment-os
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -e .
-thesis-os quickstart-stock --out ./quickstart_run
-```
-
-The quickstart uses a bundled sample CSV by default, so it works without network access. It creates a local SQLite DB, markdown vault, quantitative screener candidates, thesis card, decision card, prediction ledger, rolling forward-return feedback notes, wiki/SSOT notes, and a static dashboard at `quickstart_run/vault/dashboard/index.html`.
+The quickstart above uses a bundled sample CSV by default, so it works without network access. It creates a local SQLite DB, markdown vault, quantitative screener candidates, thesis card, decision card, prediction ledger, rolling forward-return feedback notes, wiki/SSOT notes, and a static dashboard at `quickstart_run/vault/dashboard/index.html`.
 
 It also writes `quickstart_run/vault/feedback/quickstart-rolling-walk-forward.md` and `quickstart_run/quickstart_rolling_walk_forward.json`, which report rolling windows, candidate observations, hit rate, average excess return, best/worst excess return, and the per-window candidate table. The bundled sample numbers are a loop demonstration, not an alpha claim.
 
@@ -123,10 +132,6 @@ thesis-os quickstart-stock --out ./quickstart_live --live --tickers NVDA,AAPL,MS
 Live mode uses Yahoo chart data first, retries transient failures such as `429`/`503`, and falls back to Stooq when possible. For production research, bring a more reliable licensed or public data adapter.
 
 Prefer a fully offline run? Use `thesis-os demo --out ./demo_run` to generate synthetic public-safe sample data.
-
-<p align="center">
-  <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
-</p>
 
 <p align="center">
   <img src="docs/assets/thesis-os-architecture.png" alt="Thesis OS architecture" width="100%">

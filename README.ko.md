@@ -1,16 +1,35 @@
 # Thesis OS
 
+[![CI](https://github.com/youngseongshin/thesis-investment-os/actions/workflows/ci.yml/badge.svg)](https://github.com/youngseongshin/thesis-investment-os/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 [English README](README.md)
 
 > 시장을 요약하는 에이전트가 아니라, 테시스를 유지하고, 판단을 기록하고, 예측을 사전에 남기고, 나중에 스스로 채점하는 투자 리서치 에이전트 시스템.
 
-Thesis OS는 **근거 우선, 테시스 기반 투자 판단 OS**입니다.
+Thesis OS는 **근거 우선, 테시스 기반 투자 판단 OS**입니다. 흩어진 시장 정보를 테시스, 판단, 예측, 피드백 루프로 바꿔 나중에 감사할 수 있게 해주는, 실행 가능한 오픈소스 코어입니다.
 
-정량 데이터, 정성 인텔리전스, 로컬 데이터베이스, 마크다운 vault, 에이전트형 워크플로우, 예측 원장, 피드백 루프를 하나의 감사 가능한 판단 루프로 묶습니다.
+종목 리서치, 스크리너, 트레이딩 저널, 포트폴리오 판단을 감으로 남기지 않고 감사 가능한 기록으로 남기고 싶은 투자자와 빌더를 위한 프레임워크입니다.
 
-이 프로젝트는 **investment research, stock research, stock screener, trading journal, portfolio management, equity research, quantitative finance, AI agents** 같은 주제를 다루는 투자자와 빌더를 위한 프레임워크입니다.
+자동매매 봇도, 시그널 판매기도, AI 종목 추천기도 아니며 알파를 약속하지 않습니다. 투자 판단을 명시적이고, 검증 가능하며, 자기 트랙레코드에 정직하게 만드는 프레임워크입니다.
 
-목표는 자동매매 봇, 시그널 판매기, AI 종목 추천기를 만드는 것이 아닙니다. 목표는 투자 판단을 더 명시적이고, 검증 가능하며, 시간이 지날수록 개선 가능한 형태로 만드는 것입니다.
+## 빠른 시작
+
+```bash
+git clone https://github.com/youngseongshin/thesis-investment-os.git
+cd thesis-investment-os
+python3 -m venv .venv && . .venv/bin/activate
+python -m pip install -e .
+thesis-os quickstart-stock --out ./quickstart_run
+```
+
+API key, 증권사 로그인, 유료 피드가 필요 없습니다. bundled sample CSV를 사용하므로 완전 offline으로 실행되며, local SQLite DB, markdown vault, 정량 스크리너 후보, thesis card, prediction, rolling forward-return feedback, 그리고 `quickstart_run/vault/dashboard/index.html`의 static dashboard를 생성합니다. no-key 실시간 데이터는 `--live --tickers NVDA,AAPL,MSFT --benchmark SPY`를 붙이세요.
+
+<p align="center">
+  <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
+</p>
 
 ## 이 프로젝트의 정체성
 
@@ -98,18 +117,9 @@ Thesis OS가 데이터 제공자까지 모두 대체할 필요는 없습니다. 
 
 기본 quickstart는 public endpoint가 shared IP에서 rate-limit되어도 첫 실행이 성공하도록 bundled sample price CSV를 사용합니다. `--live`를 붙이면 API key 없이 Yahoo Finance chart data를 먼저 조회하고 Stooq fallback을 시도합니다. 실전 사용자는 OpenBB, FinanceDataReader, pykrx, EDGAR/DART, 증권사 export, 라이선스 데이터셋, 자체 리서치 DB로 adapter를 바꾸면 됩니다. 운영 전에는 각 데이터의 license, delay, 재배포 조건, corporate-action 조정 방식, survivorship bias를 확인해야 합니다. 자세한 내용은 [Public Data Sources](docs/public-data-sources.md)를 참고하세요.
 
-## 60초 실행
+## quickstart가 만들어내는 것
 
-```bash
-git clone https://github.com/youngseongshin/thesis-investment-os.git
-cd thesis-investment-os
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -e .
-thesis-os quickstart-stock --out ./quickstart_run
-```
-
-quickstart는 기본적으로 bundled sample CSV를 사용하므로 네트워크가 없어도 실행됩니다. local SQLite DB, markdown vault, 정량 스크리너 후보, thesis card, decision card, prediction ledger, rolling forward-return feedback note, wiki/SSOT note, static dashboard를 생성합니다. 대시보드는 `quickstart_run/vault/dashboard/index.html`에서 확인할 수 있습니다.
+위 quickstart는 기본적으로 bundled sample CSV를 사용하므로 네트워크가 없어도 실행됩니다. local SQLite DB, markdown vault, 정량 스크리너 후보, thesis card, decision card, prediction ledger, rolling forward-return feedback note, wiki/SSOT note, static dashboard를 생성합니다. 대시보드는 `quickstart_run/vault/dashboard/index.html`에서 확인할 수 있습니다.
 
 추가로 `quickstart_run/vault/feedback/quickstart-rolling-walk-forward.md`와 `quickstart_run/quickstart_rolling_walk_forward.json`을 생성해 rolling window 수, 후보 observation 수, hit rate, 평균 초과수익, best/worst excess return, window별 후보 테이블을 보여줍니다. bundled sample 수치는 루프 시연용이지 알파 주장으로 쓰지 않습니다.
 
@@ -122,10 +132,6 @@ thesis-os quickstart-stock --out ./quickstart_live --live --tickers NVDA,AAPL,MS
 live mode는 Yahoo chart data를 먼저 조회하고, `429`/`503` 같은 일시적 실패는 재시도하며, 가능하면 Stooq fallback을 사용합니다. 운영용 리서치는 더 안정적인 public/라이선스 데이터 adapter를 붙이는 것이 좋습니다.
 
 완전히 offline으로 실행하려면 `thesis-os demo --out ./demo_run`으로 합성 샘플 데이터를 생성할 수 있습니다.
-
-<p align="center">
-  <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
-</p>
 
 <p align="center">
   <img src="docs/assets/thesis-os-architecture.png" alt="Thesis OS architecture" width="100%">
