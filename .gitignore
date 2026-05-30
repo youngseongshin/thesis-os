@@ -19,3 +19,8 @@ secrets/
 *.db-wal
 *.db-shm
 
+# Private screenshots accidentally dropped into docs/assets — these are real
+# portfolio/agent (Lattice) Telegram captures and must never be published.
+# Keep them local; build sanitized mock versions if examples are needed in the README.
+docs/assets/example*.jpg
+
