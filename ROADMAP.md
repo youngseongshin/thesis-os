@@ -44,6 +44,24 @@ Thesis OS is intentionally small at the public core. The roadmap expands it with
 - Failure mode classification
 - Thesis update suggestions
 
+## v0.6: Accountability Layer
+
+- Process score vs result score
+- Thesis type and native horizon discipline
+- Direction-aware result scoring
+- Public stock quickstart with bundled sample CSV and optional no-key live data
+- Rolling walk-forward screener feedback
+- Redaction gate and public-safe sample outputs
+- README positioning around accountability rather than stock picking
+
+## v0.7: Public Launch Readiness
+
+- Prediction ledger hero/demo
+- Promotion and compliance guardrails
+- Public-safe hit/miss accountability sample
+- GitHub topics and package keywords aligned with `judgment-os`, `prediction-ledger`, `auditable-ai`, and `evidence-first`
+- More realistic optional public-data adapters while preserving a guaranteed offline first run
+
 ## v1.0: Reproducible Thesis Loop
 
 - Pluggable adapters

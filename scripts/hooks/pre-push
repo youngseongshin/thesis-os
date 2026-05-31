@@ -5,7 +5,7 @@
 # real prevention layer for a PUBLIC repo (GitHub CI is post-hoc: on a direct
 # push the leak is already public by the time CI fails).
 #
-# Policy SSOT: Research OS registry M-20260529-03 §9.
+# Policy SSOT: this public repository's security and promotion boundary docs.
 #
 # Install (one-time, per clone):
 #   cp scripts/hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push

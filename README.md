@@ -7,13 +7,23 @@
 
 [한국어 README](README.ko.md)
 
-> Build investment research agents that do not just summarize markets. They maintain theses, make decisions, register predictions, and grade themselves later.
+> Stop building persuasive AI. Build accountable AI.
 
-**Thesis OS is an evidence-first, thesis-driven investment research operating system.** It is a runnable open-source core that turns fragmented market information into theses, decisions, predictions, and feedback loops you can audit later.
+**Thesis OS is an accountability layer for investment agents.** It is a runnable open-source core that turns fragmented market information into theses, decisions, predictions, and forward-return feedback loops you can audit later.
 
 It is for investors and builders who want their stock research, screeners, and trading-journal decisions to leave an auditable trail — not just another wall of signals.
 
 It is **not** an autonomous trading bot, a signal seller, or an AI stock picker, and it does not promise alpha. It is a framework for making investment judgment explicit, testable, and honest about its own track record.
+
+The core loop is simple:
+
+```text
+register prediction -> wait without rewriting the thesis -> grade process and outcome
+```
+
+<p align="center">
+  <img src="docs/assets/prediction-ledger-demo.gif" alt="Prediction ledger to feedback loop demo" width="100%">
+</p>
 
 ## Quickstart
 
@@ -25,7 +35,7 @@ python -m pip install -e .
 thesis-os quickstart-stock --out ./quickstart_run
 ```
 
-No API keys, broker logins, or paid feeds required. The run uses a bundled sample CSV — so it works fully offline — then builds a local SQLite DB, a markdown vault, quant screener candidates, a thesis card, a prediction, rolling forward-return feedback, and a static dashboard at `quickstart_run/vault/dashboard/index.html`. Add `--live --tickers NVDA,AAPL,MSFT --benchmark SPY` for no-key Yahoo/Stooq data.
+No API keys, broker logins, or paid feeds required. Your portfolio data never has to leave your machine. The run uses a bundled sample CSV — so it works fully offline — then builds a local SQLite DB, a markdown vault, quant screener candidates, a thesis card, a prediction, rolling forward-return feedback, and a static dashboard at `quickstart_run/vault/dashboard/index.html`. Add `--live --tickers NVDA,AAPL,MSFT --benchmark SPY` for no-key Yahoo/Stooq data.
 
 <p align="center">
   <img src="docs/assets/dashboard-cockpit.png" alt="Thesis OS dashboard cockpit" width="100%">
@@ -77,6 +87,7 @@ No broker credentials, private chats, or paid feeds are required for the public 
 | See the cockpit | `open ./quickstart_run/vault/dashboard/index.html` | A static review surface for theses, watchlists, actions, predictions, and feedback |
 | Run the fully offline synthetic demo | `thesis-os demo --out ./demo_run` | Local DB, vault notes, sample thesis card, decision card, prediction ledger, feedback notes, and dashboard |
 | Inspect realistic outputs | [`examples/sample_outputs/`](examples/sample_outputs/) | Public-safe thesis card, Top 5 deep dive, concentration strategy, screener results, screener feedback, and social collection |
+| Inspect the accountability table | [`prediction-ledger-accountability.md`](examples/sample_outputs/prediction-ledger-accountability.md) | Synthetic hit/miss examples that separate process score from result score |
 | Extend the system | [`examples/sample_jobs.yaml`](examples/sample_jobs.yaml), [`examples/sample_agent_skills.yaml`](examples/sample_agent_skills.yaml) | Recurring job and skill contracts that keep automation auditable |
 
 ## Follow The Live Research
@@ -91,6 +102,8 @@ Thesis OS is the open-source framework. Korea Invest Insights is where the broad
 
 These channels are examples of a live research publishing surface. They are not required to run Thesis OS, and the repository does not include private portfolio data or private automation.
 
+Compliance boundary: Thesis OS is a framework, not investment advice or a stock-recommendation service. Public examples are synthetic or public-safe unless explicitly stated otherwise. See [Promotion And Compliance Guardrails](docs/promotion-and-compliance.md).
+
 ## Why It Is Different
 
 | Common investment workflow | Thesis OS |
@@ -98,6 +111,7 @@ These channels are examples of a live research publishing surface. They are not 
 | Research notes pile up and go stale | Thesis cards stay linked to current evidence |
 | Screeners produce lists with no accountability | Candidates are evaluated over forward horizons |
 | LLMs write plausible narratives | Lattice records actions, predictions, invalidation, and feedback |
+| Winning examples get cherry-picked | Prediction ledgers should show hits and misses together |
 | Short-term returns overrule every thesis | Thesis type and native horizon distinguish timing trades from compounder holds |
 | Data lives in scattered tools | Local DB + markdown vault + wiki/SSOT keep retrieval clean |
 | Automation is a bundle of scripts | Harness contracts define owner, trigger, inputs, outputs, delivery, and failure policy |
@@ -308,6 +322,7 @@ The repository includes sanitized examples of the outputs a Thesis OS deployment
 | [Nightly concentrated strategy](examples/sample_outputs/nightly-concentration-strategy.md) | How Lattice turns candidates into concentration, hold, trim, or watch judgments |
 | [Screener discovery results](examples/sample_outputs/screener-discovery-results.md) | How quantitative screeners create explainable candidate queues |
 | [Screener performance feedback](examples/sample_outputs/screener-performance-feedback.md) | How forward returns grade whether a screener signal actually worked |
+| [Prediction ledger accountability](examples/sample_outputs/prediction-ledger-accountability.md) | How hits and misses stay visible in one ledger |
 | [Social collection summary](examples/sample_outputs/social-collection-summary.md) | How qualitative channels can be summarized without storing private raw feeds |
 
 These examples are synthetic and public-safe. They demonstrate structure, not investment advice or real portfolio data. See [Sample Output Pack](docs/sample-output-pack.md) for the boundary rules.

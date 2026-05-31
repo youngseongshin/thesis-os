@@ -27,6 +27,7 @@ Use these examples to understand the operating loop:
 - [Nightly concentrated strategy](nightly-concentration-strategy.md)
 - [Screener discovery results](screener-discovery-results.md)
 - [Screener performance feedback](screener-performance-feedback.md)
+- [Prediction ledger accountability](prediction-ledger-accountability.md)
 - [Social collection summary](social-collection-summary.md)
 
 ## Public Boundary

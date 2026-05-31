@@ -29,3 +29,16 @@ private repo or local runtime:
 
 Public adapters should be examples. Real adapters should read credentials from the runtime environment and write only sanitized outputs.
 
+## Promotion Boundary
+
+Security and compliance are connected. Public material should promote the framework, not live investment advice.
+
+Do not publish:
+
+- broker or account screenshots
+- private portfolio performance
+- selective profitable predictions without misses
+- live trade recommendations
+- paid interactive stock guidance
+
+See [Promotion And Compliance Guardrails](promotion-and-compliance.md).

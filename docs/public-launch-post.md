@@ -1,5 +1,7 @@
 # Why Thesis OS Is Not Another Stock Picker
 
+Stop building persuasive AI. Build accountable AI.
+
 Most AI investing tools try to answer one question:
 
 > What should I buy?
@@ -68,6 +70,16 @@ Thesis OS uses a simple three-agent operating model:
 
 The goal is not to make a chatbot sound confident. The goal is to separate collection, judgment, and governance so the system can be reviewed.
 
+## The Accountability Layer
+
+The differentiator is not another prompt pattern. It is the ledger.
+
+Thesis OS records predictions before outcomes, keeps the original thesis intact, and grades both process quality and market outcome later. That means a demo should show both hits and misses. If a system only promotes the winners, it is marketing, not accountability.
+
+```text
+register prediction -> preserve original record -> grade process/result -> improve the next rule
+```
+
 ## What The Project Gives Builders
 
 Thesis OS is useful if you want to build your own research system and need:
@@ -83,6 +95,8 @@ Thesis OS is useful if you want to build your own research system and need:
 - job and skill contracts for recurring automation
 
 It is early and intentionally public-safe. It does not include private portfolio data, broker sessions, paid raw feeds, or private chat logs.
+
+It also does not provide investment advice, stock recommendations, or live trading signals. The public examples are synthetic or public-safe workflow examples.
 
 ## The Principle
 

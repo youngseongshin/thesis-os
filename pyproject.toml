@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "thesis-os"
-version = "0.6.0"
-description = "A thesis-driven investment framework for stock screeners, trading journals, portfolio feedback loops, and AI agents."
+version = "0.6.1"
+description = "An accountability layer for investment agents: thesis cards, prediction ledgers, stock screeners, and feedback loops."
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
@@ -23,6 +23,11 @@ keywords = [
   "equity-research",
   "quantitative-finance",
   "ai-agents",
+  "judgment-os",
+  "prediction-ledger",
+  "auditable-ai",
+  "evidence-first",
+  "accountability-layer",
   "thesis-os",
   "thesis",
   "evidence",

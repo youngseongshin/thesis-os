@@ -26,6 +26,7 @@ source_policy: synthetic_example
 | Concentrated strategy review | Shows portfolio-level common-driver thinking |
 | Screener discovery results | Shows how Alpha compresses candidates |
 | Screener performance feedback | Shows the closed loop from signal to outcome |
+| Prediction ledger accountability | Shows hits and misses together, with process and result scores separated |
 | Social collection summary | Shows how qualitative signals are summarized safely |
 
 ## Design Principle
@@ -51,11 +52,11 @@ New contributors can read the sample outputs in this order:
 3. `thesis-card-ai-infrastructure-basket.md`
 4. `nightly-concentration-strategy.md`
 5. `screener-performance-feedback.md`
-6. `social-collection-summary.md`
+6. `prediction-ledger-accountability.md`
+7. `social-collection-summary.md`
 
 This order follows the operating loop:
 
 ```text
 collect -> screen -> compress -> judge -> record -> evaluate -> improve
 ```
-

@@ -3,8 +3,7 @@
 
 Fails (exit 1) if any tracked file looks like it leaks a secret, a private
 credential, or owner/organization PII. This is the automatable half of the
-private/public boundary policy defined in the Research OS registry
-(tobe/migrations/M-20260529-03-thesisos-public-oss-skeleton.md §9).
+public/private boundary policy for this public Thesis OS repository.
 
 Dependency-free. Scans `git ls-files` so only tracked content is checked.
 Run locally before pushing, and in CI on every push / pull_request.

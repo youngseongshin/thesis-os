@@ -54,6 +54,115 @@ def terminal_frame(lines: list[str], cursor: bool = False) -> Image.Image:
     return img
 
 
+def wrap_text(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont | ImageFont.ImageFont, max_width: int) -> list[str]:
+    words = text.split()
+    lines: list[str] = []
+    current = ""
+    for word in words:
+        candidate = f"{current} {word}".strip()
+        if draw.textlength(candidate, font=font) <= max_width:
+            current = candidate
+        else:
+            if current:
+                lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines
+
+
+def prediction_ledger_frame(step: int) -> Image.Image:
+    width, height = 1280, 720
+    img = Image.new("RGB", (width, height), "#f8fafc")
+    draw = ImageDraw.Draw(img)
+    title = load_font(40)
+    subtitle = load_font(22)
+    label = load_font(24)
+    body = load_font(18)
+    mono = load_font(18)
+
+    draw.rounded_rectangle((48, 42, width - 48, 132), radius=24, fill="#0f766e")
+    draw.text((78, 66), "Thesis OS", fill="#ffffff", font=title)
+    draw.text((330, 82), "Stop building persuasive AI. Build accountable AI.", fill="#ccfbf1", font=subtitle)
+
+    stages = [
+        {
+            "name": "1. Register",
+            "headline": "Write the thesis before the outcome",
+            "details": ["claim", "evidence IDs", "invalidation", "native horizon"],
+            "color": "#dbeafe",
+            "border": "#60a5fa",
+        },
+        {
+            "name": "2. Wait",
+            "headline": "Do not rewrite the original judgment",
+            "details": ["prediction ledger", "action queue", "timestamped record"],
+            "color": "#fef3c7",
+            "border": "#f59e0b",
+        },
+        {
+            "name": "3. Grade",
+            "headline": "Measure process and market outcome separately",
+            "details": ["process score", "result score", "failure mode", "feedback note"],
+            "color": "#fce7f3",
+            "border": "#ec4899",
+        },
+    ]
+
+    x_positions = [70, 470, 870]
+    y = 190
+    for idx, stage_info in enumerate(stages):
+        active = idx <= step
+        fill = stage_info["color"] if active else "#e5e7eb"
+        border = stage_info["border"] if active else "#cbd5e1"
+        draw.rounded_rectangle((x_positions[idx], y, x_positions[idx] + 340, y + 220), radius=18, fill=fill, outline=border, width=4)
+        draw.text((x_positions[idx] + 24, y + 24), stage_info["name"], fill="#0f172a", font=label)
+        detail_y = y + 68
+        for line in wrap_text(draw, stage_info["headline"], body, 292):
+            draw.text((x_positions[idx] + 24, detail_y), line, fill="#1e293b", font=body)
+            detail_y += 24
+        detail_y += 10
+        for detail in stage_info["details"]:
+            draw.text((x_positions[idx] + 28, detail_y), f"- {detail}", fill="#334155", font=body)
+            detail_y += 28
+        if idx < len(stages) - 1:
+            arrow_color = "#0f172a" if idx < step else "#94a3b8"
+            draw.line((x_positions[idx] + 350, y + 110, x_positions[idx + 1] - 20, y + 110), fill=arrow_color, width=6)
+            draw.polygon(
+                [
+                    (x_positions[idx + 1] - 20, y + 110),
+                    (x_positions[idx + 1] - 44, y + 96),
+                    (x_positions[idx + 1] - 44, y + 124),
+                ],
+                fill=arrow_color,
+            )
+
+    draw.rounded_rectangle((120, 470, width - 120, 638), radius=18, fill="#111827")
+    ledger_lines = [
+        '{',
+        '  "prediction": "candidate should outperform over native horizon",',
+        '  "process_score": 0.89,',
+        '  "result_score": 0.62,',
+        '  "lesson": "signal worked, but thesis evidence needs breadth"',
+        '}',
+    ]
+    text_y = 492
+    for line in ledger_lines:
+        color = "#bfdbfe" if ":" in line else "#e5e7eb"
+        draw.text((150, text_y), line, fill=color, font=mono)
+        text_y += 22
+
+    draw.text((120, 660), "Public-safe sample. Not financial advice. Synthetic values shown for workflow demonstration.", fill="#64748b", font=body)
+    return img
+
+
+def render_prediction_ledger_demo() -> Path:
+    frames = [prediction_ledger_frame(i) for i in range(3)]
+    path = ASSETS / "prediction-ledger-demo.gif"
+    frames[0].save(path, save_all=True, append_images=frames[1:], duration=1300, loop=0, optimize=True)
+    return path
+
+
 def render_terminal_demo() -> Path:
     frames_text = [
         [
@@ -141,8 +250,9 @@ def render_terminal_demo() -> Path:
 
 def main() -> int:
     ASSETS.mkdir(parents=True, exist_ok=True)
-    path = render_terminal_demo()
-    print(path)
+    paths = [render_terminal_demo(), render_prediction_ledger_demo()]
+    for path in paths:
+        print(path)
     return 0
 
 

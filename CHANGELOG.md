@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.1 - 2026-05-31
+
+- Reposition README hero around the accountability layer: "Stop building persuasive AI. Build accountable AI."
+- Add a prediction-ledger demo GIF that shows register -> wait -> grade.
+- Add a public-safe prediction ledger accountability sample that shows hits and misses together.
+- Add promotion and compliance guardrails, including disclaimer language and public/private promotion boundaries.
+- Expand the public launch plan around P0/P1/P2/P3 sequencing, developer audience, VC/finance audience, and legal-review gates.
+- Add `judgment-os`, `prediction-ledger`, `auditable-ai`, `evidence-first`, and `accountability-layer` keywords.
+
 ## 0.6.0 - 2026-05-29
 
 - Separate process quality from market outcome: add `process_score`, `result_score`, and `outcome_confidence` to screener and judgment feedback so a sound process is not graded by noisy short-term results.
@@ -46,7 +55,7 @@
 - Expand README and Korean README around thesis cards and judgment feedback loops.
 - Add operating workflow and investment philosophy docs.
 - Add sample Lattice roundtable command for increase/hold/decrease/exit/watch decisions.
-- Add CSV-backed Alpha quant screener inspired by the current Research OS screener stack.
+- Add CSV-backed Alpha quant screener inspired by a production screener stack.
 - Add three-channel daily discovery and Top 5 portfolio-review queue.
 - Add KR/US market-close local DB refresh adapter.
 - Add intraday holdings/watchlist price and flow alert adapter.

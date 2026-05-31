@@ -25,3 +25,8 @@ The public repository should contain schemas, templates, examples, and adapter i
 
 Private deployments should keep credentials, real adapters, private vaults, and real portfolio data outside this repository.
 
+## Promotion Boundary
+
+Do not use this repository to publish private portfolio data, selective profitable predictions, live stock recommendations, or target-price promotion. Thesis OS is a framework, not investment advice or a signal service.
+
+See [Promotion And Compliance Guardrails](docs/promotion-and-compliance.md).
