@@ -37,7 +37,7 @@ Thesis OS is not a clone of a private portfolio system and not a complete privat
 
 Bring your own data sources, investing philosophy, watchlists, broker adapters, private notes, and agent prompts. Thesis OS gives you the operating structure: how to turn fragmented market information into theses, decisions, predictions, and feedback.
 
-Most AI investing tools try to recommend stocks. Thesis OS takes a different route:
+Most AI investing tools either recommend stocks or aggregate more data for you to react to. Thesis OS takes a different route:
 
 > Record why an investment idea should work, what would invalidate it, what action it implies, and whether it actually worked after time passed.
 
